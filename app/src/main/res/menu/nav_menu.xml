@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/ic_movie"
+        android:icon="@drawable/ic_movie"
+        android:title="@string/swipe"/>
+
+    <item
+        android:id="@+id/ic_match"
+        android:icon="@drawable/ic_match"
+        android:title="@string/match"/>
+
+    <item
+        android:id="@+id/ic_search"
+        android:icon="@drawable/ic_search"
+        android:title="@string/search"/>
+
+    <item
+        android:id="@+id/ic_account"
+        android:icon="@drawable/ic_account"
+        android:title="@string/account"/>
+
+</menu>
