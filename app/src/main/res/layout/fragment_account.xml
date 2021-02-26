@@ -9,7 +9,7 @@
         android:id="@+id/textView_account"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/account"
+        android:text="@string/TMDbCredits"
         android:textColor="@color/purple_200"
         android:textSize="36sp" />
 </FrameLayout>
