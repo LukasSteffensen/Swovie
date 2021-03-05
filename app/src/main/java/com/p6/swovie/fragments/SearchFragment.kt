@@ -34,6 +34,7 @@ class SearchFragment : Fragment() {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_search, container, false)
 
+        //Showing popular movies in RecyclerView (scrollable, vertical)
         popularMovies = root.findViewById(R.id.recyclerView_movies)
         popularMoviesLayoutMgr = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         popularMovies.layoutManager = popularMoviesLayoutMgr
@@ -45,7 +46,7 @@ class SearchFragment : Fragment() {
         return root
     }
 
-    private fun attachPopularMoviesOnScrollListener() {
+    private fun attachPopularMoviesOnScrollListener() { //Basicly updates when scolling, showing movies as you scroll
         popularMovies.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             val totalItemCount =
@@ -64,7 +65,7 @@ class SearchFragment : Fragment() {
         })
     }
 
-    private fun getPopularMovies() {
+    private fun getPopularMovies() { // Fetching data from JSON
         MoviesRepository.getPopularMovies(
             popularMoviesPage,
             onSuccess = ::onPopularMoviesFetched,
@@ -72,13 +73,13 @@ class SearchFragment : Fragment() {
         )
     }
 
-    private fun onPopularMoviesFetched(movies: List<Movie>) {
+    private fun onPopularMoviesFetched(movies: List<Movie>) { //Used in getPopularMovies. Fetch data if success
         Log.d("SearchFragment", "Movies: $movies")
         popularMoviesAdapter.appendMovies(movies)
         attachPopularMoviesOnScrollListener()
     }
 
-    private fun onError() {
+    private fun onError() { //Used in getPopularMovies
         Toast.makeText(activity, "Error fetching movies", Toast.LENGTH_SHORT).show()
     }
 

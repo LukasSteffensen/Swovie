@@ -45,13 +45,6 @@ class MovieFragment : Fragment() {
         imageViewMovie = root.findViewById(R.id.imageView_movie)
         textViewTitle = root.findViewById(R.id.textView_title)
 
-
-        /*val jsonArray = JSONArray(JSON_URL_FIGHTCLUB)
-        //for (jsonIndex in 0..(jsonArray.length() - 1)) {
-        //    Log.d("JSON", jsonArray.getJSONObject(jsonIndex).getString("title"))
-        //}
-        val title = JSON_URL_FIGHTCLUB.getJSONObject().getString("original_title")*/
-
         textViewTitle.text = "Title of Movie"
         Glide.with(root)
                 .load(JSON_URL_IMAGE)

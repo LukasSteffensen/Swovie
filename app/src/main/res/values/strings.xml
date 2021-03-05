@@ -6,6 +6,11 @@
     <string name="account">Account</string>
     <string name="movie">Movie</string>
     <string name="title">Title</string>
+    <string name="like">Like</string>
+    <string name="superlike">Super like</string>
+    <string name="nottoday">Not Today</string>
+    <string name="never">Never</string>
+
     <string name="TMDbCredits">This product uses the TMDb API but is not endorsed or certified by TMDb.</string>
 
 

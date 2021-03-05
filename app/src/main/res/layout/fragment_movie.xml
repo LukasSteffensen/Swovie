@@ -24,4 +24,44 @@
         android:layout_height="wrap_content"
         android:text="@string/title"
         android:textSize="32sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/imageButton_never"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/never"
+            android:src="@drawable/ic_block"/>
+
+        <ImageButton
+            android:id="@+id/imageButton_nottoday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/nottoday"
+            android:src="@drawable/ic_sync" />
+
+        <ImageButton
+            android:id="@+id/imageButton_like"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/like"
+            android:src="@drawable/ic_favorite" />
+
+        <ImageButton
+            android:id="@+id/imageButton_superlike"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/superlike"
+            android:src="@drawable/ic_star"/>
+
+    </LinearLayout>
+
 </androidx.appcompat.widget.LinearLayoutCompat>
