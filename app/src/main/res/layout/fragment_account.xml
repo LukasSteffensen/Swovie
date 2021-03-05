@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.AccountFragment">
+    tools:context=".fragments.AccountFragment"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/textView_account"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/TMDbCredits"
         android:textColor="@color/purple_200"
         android:textSize="36sp" />
-</FrameLayout>
+
+    <ImageView
+        android:id="@+id/imageView_logo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/account"
+        android:src="@drawable/ic_account" />
+</LinearLayout>
