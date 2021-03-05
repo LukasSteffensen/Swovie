@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +20,8 @@ class SearchFragment : Fragment() {
 
     private lateinit var popularMovies: RecyclerView
     private lateinit var popularMoviesAdapter: MoviesAdapter
+    private lateinit var popularMoviesLayoutMgr: LinearLayoutManager
+    private var popularMoviesPage = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,22 +35,47 @@ class SearchFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_search, container, false)
 
         popularMovies = root.findViewById(R.id.recyclerView_movies)
-        popularMovies.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL,false)
-        popularMoviesAdapter = MoviesAdapter(listOf())
+        popularMoviesLayoutMgr = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+        popularMovies.layoutManager = popularMoviesLayoutMgr
+        popularMoviesAdapter = MoviesAdapter(mutableListOf())
         popularMovies.adapter = popularMoviesAdapter
 
-        MoviesRepository.getPopularMovies(
-            onSuccess = ::onPopularMoviesFetched,
-            onError = ::onError
-        )
-
+        getPopularMovies()
 
         return root
     }
 
+    private fun attachPopularMoviesOnScrollListener() {
+        popularMovies.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            val totalItemCount =
+                popularMoviesLayoutMgr.itemCount //the total number of movies inside our popularMoviesAdapter. This will keep increasing the more we call popularMoviesAdapter.appendMovies().
+            val visibleItemCount =
+                popularMoviesLayoutMgr.childCount //the current number of child views attached to the RecyclerView that are currently being recycled over and over again. The value of this variable for common screen sizes will range roughly around 4-5 which are 3 visible views, +1 left view that’s not seen yet and +1 right view that’s not seen yet also. The value will be higher if you have a bigger screen.
+            val firstVisibleItem =
+                popularMoviesLayoutMgr.findFirstVisibleItemPosition() // is the position of the leftmost visible item in our list.
+
+            if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
+                popularMovies.removeOnScrollListener(this)
+                popularMoviesPage++
+                getPopularMovies()
+            }
+        }
+        })
+    }
+
+    private fun getPopularMovies() {
+        MoviesRepository.getPopularMovies(
+            popularMoviesPage,
+            onSuccess = ::onPopularMoviesFetched,
+            onError = ::onError
+        )
+    }
+
     private fun onPopularMoviesFetched(movies: List<Movie>) {
         Log.d("SearchFragment", "Movies: $movies")
-        popularMoviesAdapter.updateMovies(movies)
+        popularMoviesAdapter.appendMovies(movies)
+        attachPopularMoviesOnScrollListener()
     }
 
     private fun onError() {

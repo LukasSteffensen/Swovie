@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 
-class MoviesAdapter (private var movies: List<Movie>) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>() {
+class MoviesAdapter (private var movies: MutableList<Movie>) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
             val view = LayoutInflater
@@ -23,10 +23,14 @@ class MoviesAdapter (private var movies: List<Movie>) : RecyclerView.Adapter<Mov
             holder.bind(movies[position])
         }
 
-        fun updateMovies(movies: List<Movie>) {
-            this.movies = movies
-            notifyDataSetChanged()
+        fun appendMovies(movies: List<Movie>) {
+            this.movies.addAll(movies)
+            notifyItemRangeInserted(
+                this.movies.size,
+                movies.size -1
+            )
         }
+
 
     inner class MovieViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
