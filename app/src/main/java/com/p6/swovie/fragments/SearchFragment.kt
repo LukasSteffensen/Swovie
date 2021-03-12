@@ -1,23 +1,22 @@
 package com.p6.swovie.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.p6.swovie.Movie
-import com.p6.swovie.MoviesAdapter
-import com.p6.swovie.MoviesRepository
-import com.p6.swovie.R
+import com.p6.swovie.*
 
 class SearchFragment : Fragment() {
 
-
+    private lateinit var buttonSearch: Button
     private lateinit var popularMovies: RecyclerView
     private lateinit var popularMoviesAdapter: MoviesAdapter
     private lateinit var popularMoviesLayoutMgr: LinearLayoutManager
@@ -38,7 +37,7 @@ class SearchFragment : Fragment() {
         popularMovies = root.findViewById(R.id.recyclerView_movies)
         popularMoviesLayoutMgr = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         popularMovies.layoutManager = popularMoviesLayoutMgr
-        popularMoviesAdapter = MoviesAdapter(mutableListOf())
+        popularMoviesAdapter = MoviesAdapter(mutableListOf()) { movie -> showMovieDetails(movie) }
         popularMovies.adapter = popularMoviesAdapter
 
         getPopularMovies()
@@ -63,6 +62,14 @@ class SearchFragment : Fragment() {
             }
         }
         })
+    }
+
+    private fun showMovieDetails(movie: Movie) { // Put information from the clicked movie to the Detailed activity
+        val intent = Intent(activity, MovieDetailsActivity::class.java)
+        intent.putExtra(MOVIE_POSTER, movie.posterPath)
+        intent.putExtra(MOVIE_TITLE, movie.title)
+        intent.putExtra(MOVIE_OVERVIEW, movie.overview)
+        startActivity(intent)
     }
 
     private fun getPopularMovies() { // Fetching data from JSON
