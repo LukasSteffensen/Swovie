@@ -6,14 +6,20 @@
     <string name="account">Account</string>
     <string name="movie">Movie</string>
     <string name="title">Title</string>
+
+    <!-- MovieFragment -->
     <string name="like">Like</string>
     <string name="superlike">Super like</string>
     <string name="nottoday">Not Today</string>
     <string name="never">Never</string>
-
-    <string name="TMDbCredits">This product uses the TMDb API but is not endorsed or certified by TMDb.</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- AccountFragment -->
+    <string name="TMDbCredits">This product uses the TMDb API but is not endorsed or certified by TMDb.</string>
+    <string name="logout">Log out</string>
+    <string name="resetpassword">Reset password</string>
+    <string name="refreshswipes">Refresh all swipes</string>
+
 
 
 </resources>

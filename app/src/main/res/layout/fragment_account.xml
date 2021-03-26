@@ -1,24 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.AccountFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".fragments.AccountFragment">
+
+    <Button
+        android:id="@+id/button_refresh_swipes"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:background="@color/secondary"
+        android:padding="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:text="@string/refreshswipes"
+        app:layout_constraintBottom_toTopOf="@+id/button_reset_password"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/button_reset_password"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:background="@color/secondary"
+        android:padding="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:text="@string/resetpassword"
+        app:layout_constraintBottom_toTopOf="@+id/button_logout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/button_logout"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:background="@color/secondary"
+        android:padding="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="64dp"
+        android:text="@string/logout"
+        app:layout_constraintBottom_toTopOf="@+id/textView_account"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textView_account"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="64dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         android:text="@string/TMDbCredits"
-        android:textColor="@color/purple_200"
-        android:textSize="36sp" />
+        android:textAlignment="textStart"
+        android:textColor="@color/primary"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <ImageView
-        android:id="@+id/imageView_logo"
+    <TextView
+        android:id="@+id/textView_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/account"
-        android:src="@drawable/ic_account" />
-</LinearLayout>
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="32dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text="@string/app_name"
+        android:textAlignment="center"
+        android:textColor="@color/primary"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toTopOf="@+id/button_refresh_swipes"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
