@@ -32,6 +32,7 @@
 
         <ImageButton
             android:id="@+id/imageButton_never"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -40,6 +41,7 @@
 
         <ImageButton
             android:id="@+id/imageButton_nottoday"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -48,6 +50,7 @@
 
         <ImageButton
             android:id="@+id/imageButton_like"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -56,6 +59,7 @@
 
         <ImageButton
             android:id="@+id/imageButton_superlike"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

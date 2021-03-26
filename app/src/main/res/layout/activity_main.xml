@@ -17,8 +17,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/design_default_color_primary_dark"
-        app:itemBackground="@color/design_default_color_primary"
+        android:background="@color/primary_dark"
+        app:itemBackground="@color/primary"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
         app:menu="@menu/nav_menu"/>

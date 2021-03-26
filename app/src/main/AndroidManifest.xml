@@ -9,7 +9,7 @@
         android:icon="@drawable/s_logo_gradiant"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.NoActionBar">
+        android:theme="@style/Theme.Swovie">
         <activity android:name=".MovieDetailsActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
