@@ -1,13 +1,12 @@
 package com.p6.swovie.fragments
 
+import android.media.Image
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -24,7 +23,10 @@ class MovieFragment : Fragment() {
     private lateinit var textViewTitle: TextView
     private val client = OkHttpClient()
 
-
+    private lateinit var buttonNever: ImageButton
+    private lateinit var buttonNotToday: ImageButton
+    private lateinit var buttonLike: ImageButton
+    private lateinit var buttonSuperLike: ImageButton
     private val JSON_URL_IMAGE = "https://image.tmdb.org/t/p/original/z8onk7LV9Mmw6zKz4hT6pzzvmvl.jpg"
     private val JSON_URL = "https://api.themoviedb.org/3/movie/22?api_key=9870f62e69820872d263749cf1055bc1"
     private val JSON_URL_POPULAR = "https://api.themoviedb.org/3/movie/popular?api_key=9870f62e69820872d263749cf1055bc1"
@@ -47,6 +49,10 @@ class MovieFragment : Fragment() {
 
         imageViewMovie = root.findViewById(R.id.imageView_movie)
         textViewTitle = root.findViewById(R.id.textView_title)
+        buttonNever = root.findViewById(R.id.imageView_never)
+        buttonNotToday = root.findViewById(R.id.imageView_not_today)
+        buttonLike = root.findViewById(R.id.imageView_like)
+        buttonSuperLike = root.findViewById(R.id.imageView_super_like)
 
         MoviesRepository.getPopularMovies(
                 onSuccess = ::onPopularMoviesFetched,

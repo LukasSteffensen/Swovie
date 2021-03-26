@@ -9,39 +9,77 @@
     android:orientation="vertical">
 
 
-    <ImageView
-        android:id="@+id/imageView_movie"
-        app:layout_constraintCircleRadius="4dp"
+    <LinearLayout
+        android:id="@+id/linearLayout_top"
         android:layout_width="match_parent"
-        android:layout_height="384dp"
-        android:contentDescription="@string/movie"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_movie" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/button_filter"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/filter"
+            android:textColor="@color/secondary"/>
+
+        <Button
+            android:id="@+id/button_matches"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/viewmatches"
+            android:textColor="@color/secondary"/>
+    </LinearLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView_poster"
+        android:layout_width="match_parent"
+        android:layout_height="384dp"
+        android:layout_margin="5dp"
+        android:elevation="10dp"
+        app:cardCornerRadius="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout_top">
+
+        <ImageView
+            android:id="@+id/imageView_movie"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/movie"
+            app:layout_constraintCircleRadius="4dp"
+            tools:src="@drawable/ic_movie" />
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/textView_title"
-        android:layout_width="wrap_content"
+        android:layout_width="340dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="@string/title"
+        android:layout_marginStart="8dp"
+        android:text="@string/hello_blank_fragment"
         android:textAlignment="textStart"
+        android:textColor="@color/primary"
         android:textSize="32sp"
-        app:layout_constraintEnd_toStartOf="@+id/imageButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView_movie" />
+        app:layout_constraintTop_toBottomOf="@+id/cardView_poster" />
 
     <ImageButton
         android:id="@+id/imageButton"
         style="@style/Widget.MaterialComponents.Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="64dp"
+        android:layout_height="32dp"
         android:layout_weight="1"
         android:contentDescription="@string/movie"
         android:src="@drawable/ic_baseline_info_24"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView_movie" />
+        app:layout_constraintTop_toBottomOf="@+id/cardView_poster" />
 
     <TextView
         android:id="@+id/textView_genres"
@@ -83,32 +121,36 @@
         app:layout_constraintStart_toStartOf="parent">
 
 
-        <ImageView
+        <ImageButton
             android:id="@+id/imageView_never"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/never"
             android:src="@drawable/ic_block" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/imageView_not_today"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/nottoday"
             android:src="@drawable/ic_sync" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/imageView_like"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/like"
             android:src="@drawable/ic_favorite" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/imageView_super_like"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

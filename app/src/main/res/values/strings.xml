@@ -1,11 +1,14 @@
 <resources>
     <string name="app_name">Swovie</string>
     <string name="swipe">Swipe</string>
-    <string name="match">Match</string>
+    <string name="match">Group</string>
+    <string name="group">Group</string>
     <string name="search">Search</string>
     <string name="account">Account</string>
     <string name="movie">Movie</string>
     <string name="title">Title</string>
+    <string name="viewmatches">Matches</string>
+    <string name="filter">Filters</string>
 
     <!-- MovieFragment -->
     <string name="like">Like</string>
@@ -15,6 +18,8 @@
     <string name="runtime">Runtime: </string>
     <string name="alreadywatched">Already watched</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="longtext">Pirates of the Caribbean: The curse of the black pearl</string>
+
 
     <!-- GroupFragment -->
     <string name="titlegroup">Create or Join a Group</string>
