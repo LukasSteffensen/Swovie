@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,8 +11,9 @@
 
     <ImageView
         android:id="@+id/imageView_movie"
+        app:layout_constraintCircleRadius="4dp"
         android:layout_width="match_parent"
-        android:layout_height="512dp"
+        android:layout_height="384dp"
         android:contentDescription="@string/movie"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,52 +22,98 @@
 
     <TextView
         android:id="@+id/textView_title"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:text="@string/title"
-        android:textSize="32sp" />
+        android:textAlignment="textStart"
+        android:textSize="32sp"
+        app:layout_constraintEnd_toStartOf="@+id/imageButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView_movie" />
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:contentDescription="@string/movie"
+        android:src="@drawable/ic_baseline_info_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView_movie" />
+
+    <TextView
+        android:id="@+id/textView_genres"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_weight="1"
+        android:text="@string/movie"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_title" />
+
+    <TextView
+        android:id="@+id/textView_runtime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:text="@string/runtime"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_genres" />
+
+    <CheckBox
+        android:id="@+id/checkBox_already_watched"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_weight="1"
+        android:text="@string/alreadywatched"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_title" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <ImageButton
-            android:id="@+id/imageButton_never"
-            style="@style/Widget.MaterialComponents.Button"
+
+        <ImageView
+            android:id="@+id/imageView_never"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/never"
-            android:src="@drawable/ic_block"/>
+            android:src="@drawable/ic_block" />
 
-        <ImageButton
-            android:id="@+id/imageButton_nottoday"
-            style="@style/Widget.MaterialComponents.Button"
+        <ImageView
+            android:id="@+id/imageView_not_today"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/nottoday"
             android:src="@drawable/ic_sync" />
 
-        <ImageButton
-            android:id="@+id/imageButton_like"
-            style="@style/Widget.MaterialComponents.Button"
+        <ImageView
+            android:id="@+id/imageView_like"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/like"
             android:src="@drawable/ic_favorite" />
 
-        <ImageButton
-            android:id="@+id/imageButton_superlike"
-            style="@style/Widget.MaterialComponents.Button"
+        <ImageView
+            android:id="@+id/imageView_super_like"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/superlike"
-            android:src="@drawable/ic_star"/>
-
+            android:src="@drawable/ic_star" />
     </LinearLayout>
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,6 +12,8 @@
     <string name="superlike">Super like</string>
     <string name="nottoday">Not Today</string>
     <string name="never">Never</string>
+    <string name="runtime">Runtime: </string>
+    <string name="alreadywatched">Already watched</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- GroupFragment -->
