@@ -40,6 +40,12 @@
     <string name="resetpassword">Reset password</string>
     <string name="resetswipes">Reset all swipes</string>
 
+    <!-- Alert Dialogs -->
+    <string name="alertpassword">Are you sure you wish to reset password?</string>
+    <string name="alertswipes">Are you sure you wish to reset swipes?</string>
+    <string name="alertlogout">Are you sure you wish to log out?</string>
+    <string name="alertyes">Yes</string>
+    <string name="alertcancel">Cancel</string>
 
 
 </resources>
