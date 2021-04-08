@@ -41,11 +41,34 @@
     <string name="resetswipes">Reset all swipes</string>
 
     <!-- Alert Dialogs -->
+
     <string name="alertpassword">Are you sure you wish to reset password?</string>
     <string name="alertswipes">Are you sure you wish to reset swipes?</string>
     <string name="alertlogout">Are you sure you wish to log out?</string>
     <string name="alertyes">Yes</string>
     <string name="alertcancel">Cancel</string>
+    <string name="apply">Apply</string>
 
 
+
+    <!-- Genre filters -->
+    <string name="genreoptions">Genre options</string>
+    <string name="genre1">Action</string>
+    <string name="genre2">Adventure</string>
+    <string name="genre3">Animation</string>
+    <string name="genre4">Comedy</string>
+    <string name="genre5">Crime</string>
+    <string name="genre6">Documentary</string>
+    <string name="genre7">Drama</string>
+    <string name="genre8">Family</string>
+    <string name="genre9">Fantasy</string>
+    <string name="genre10">History</string>
+    <string name="genre11">Horror</string>
+    <string name="genre12">Music</string>
+    <string name="genre13">Romance</string>
+    <string name="genre14">Science Fiction</string>
+    <string name="genre15">Thriller</string>
+    <string name="genre16">TV Movie</string>
+    <string name="genre17">War</string>
+    <string name="genre18">Western</string>
 </resources>

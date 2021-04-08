@@ -1,6 +1,7 @@
 package com.p6.swovie.fragments
 
-import android.media.Image
+import android.R.attr.fragment
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils.replace
 import android.util.Log
@@ -12,10 +13,9 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.p6.swovie.*
-import okhttp3.*
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.IOException
-import java.net.URL
+import okhttp3.OkHttpClient
+import java.lang.reflect.Array.newInstance
+import java.net.URLClassLoader.newInstance
 
 
 class MovieFragment : Fragment(), View.OnClickListener {
@@ -23,13 +23,13 @@ class MovieFragment : Fragment(), View.OnClickListener {
     private lateinit var imageViewMovie: ImageView
     private lateinit var textViewTitle: TextView
     private val client = OkHttpClient()
-
     private lateinit var buttonNever: ImageButton
     private lateinit var buttonNotToday: ImageButton
     private lateinit var buttonLike: ImageButton
     private lateinit var buttonSuperLike: ImageButton
     private lateinit var buttonFilter: Button
     private lateinit var buttonMatches: Button
+    //val genres = ArrayList<String>()
     private val JSON_URL_IMAGE = "https://image.tmdb.org/t/p/original/z8onk7LV9Mmw6zKz4hT6pzzvmvl.jpg"
     private val JSON_URL = "https://api.themoviedb.org/3/movie/22?api_key=9870f62e69820872d263749cf1055bc1"
     private val JSON_URL_POPULAR = "https://api.themoviedb.org/3/movie/popular?api_key=9870f62e69820872d263749cf1055bc1"
@@ -80,6 +80,8 @@ class MovieFragment : Fragment(), View.OnClickListener {
                 .load(JSON_URL_IMAGE)
                 .into(imageViewMovie)
 
+
+
         return root
 
     }
@@ -90,11 +92,23 @@ class MovieFragment : Fragment(), View.OnClickListener {
             buttonSuperLike -> Toast.makeText(activity, "Super like", Toast.LENGTH_SHORT).show()
             buttonNotToday -> Toast.makeText(activity, "Not today", Toast.LENGTH_SHORT).show()
             buttonNever -> Toast.makeText(activity, "Never", Toast.LENGTH_SHORT).show()
-            buttonFilter -> Toast.makeText(activity, "Filter", Toast.LENGTH_SHORT).show()
+            buttonFilter -> changeToFilters()
             buttonMatches -> Toast.makeText(activity, "Matches", Toast.LENGTH_SHORT).show()
+
 
         }
     }
+
+    private fun changeToFilters(){
+        val intent = Intent (activity, FilterDialogFragment::class.java)
+        startActivity(intent)
+    }
+
+    private fun changeToMatches(){
+        val intent = Intent (activity, MainActivity::class.java)
+        startActivity(intent)
+    }
+
 
     private fun onPopularMoviesFetched(movies: List<Movie>) {
         Log.d("MovieFragment", "Movies: $movies")
@@ -111,9 +125,5 @@ class MovieFragment : Fragment(), View.OnClickListener {
                 .transform(CenterCrop())
                 .into(imageViewMovie)
         }
-
-
     }
-
-
 }
