@@ -12,6 +12,8 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import java.util.HashMap
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -24,7 +26,8 @@ class RegisterActivity : AppCompatActivity() {
 
     private lateinit var user: HashMap<String, String>
 
-    //var auth: FirebaseAuth = Firebase.auth
+    private lateinit var auth: FirebaseAuth
+
 
     // Access a Cloud Firestore instance from your Activity
     //val db = Firebase.firestore
@@ -48,9 +51,10 @@ class RegisterActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        //auth = Firebase.auth
         editTextFirstName = findViewById(R.id.editTextNameRegister)
-        editTextEmail = findViewById<EditText>(R.id.editTextEmailRegister)
-        editTextPassword = findViewById<EditText>(R.id.editTextPasswordRegister)
+        editTextEmail = findViewById(R.id.editTextEmailRegister)
+        editTextPassword = findViewById(R.id.editTextPasswordRegister)
 
         val buttonRegister = findViewById<Button>(R.id.button_register_account)
 
