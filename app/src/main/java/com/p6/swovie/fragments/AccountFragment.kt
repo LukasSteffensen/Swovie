@@ -47,6 +47,10 @@ class AccountFragment : Fragment(), View.OnClickListener {
         return root
     }
 
+    fun signOut() {
+        //Firebase.auth.signOut()
+    }
+
     override fun onClick(view: View?) { // All OnClick buttons, with strings depending on button
         when (view) {
             buttonResetSwipes -> alert(getString(R.string.resetswipes), getString(R.string.alertswipes))

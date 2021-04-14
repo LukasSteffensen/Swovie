@@ -93,10 +93,15 @@ class MovieFragment : Fragment(), View.OnClickListener {
             buttonNotToday -> Toast.makeText(activity, "Not today", Toast.LENGTH_SHORT).show()
             buttonNever -> Toast.makeText(activity, "Never", Toast.LENGTH_SHORT).show()
             buttonFilter -> changeToFilters()
-            buttonMatches -> Toast.makeText(activity, "Matches", Toast.LENGTH_SHORT).show()
+            buttonMatches -> changeToLogin()
 
 
         }
+    }
+
+    private fun changeToLogin(){
+        val intent = Intent(activity, LoginActivity::class.java)
+        startActivity(intent)
     }
 
     private fun changeToFilters(){
