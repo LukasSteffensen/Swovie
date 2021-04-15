@@ -13,8 +13,9 @@ import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
-import java.util.HashMap
+import com.p6.swovie.dataClasses.User
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -22,16 +23,8 @@ class RegisterActivity : AppCompatActivity() {
 
     private val TAG = "RegisterActivity"
 
-    private lateinit var uid: String
-
-    private lateinit var user: HashMap<String, String>
-
     private lateinit var auth: FirebaseAuth
-
-
-    // Access a Cloud Firestore instance from your Activity
-    //val db = Firebase.firestore
-
+    val db = FirebaseFirestore.getInstance()
     lateinit var editTextFirstName: EditText
     lateinit var editTextEmail: EditText
     lateinit var editTextPassword: EditText
@@ -44,6 +37,7 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
+
         val textViewSignIn = findViewById<TextView>(R.id.button_login_from_register)
 
         textViewSignIn.setOnClickListener {
@@ -51,7 +45,9 @@ class RegisterActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        //auth = Firebase.auth
+        // Initialize Firebase Auth
+        auth = Firebase.auth
+
         editTextFirstName = findViewById(R.id.editTextNameRegister)
         editTextEmail = findViewById(R.id.editTextEmailRegister)
         editTextPassword = findViewById(R.id.editTextPasswordRegister)
@@ -63,29 +59,39 @@ class RegisterActivity : AppCompatActivity() {
             email = editTextEmail.text.toString().trim()
             password = editTextPassword.text.toString().trim()
 
-            //Checks if all the editTexts are empty and if some requirements are not met
-            if (firstName.isEmpty()) {
-                inputAgain(editTextFirstName, "Please put in your first name")
-            } else if (email.isEmpty()) {
-                inputAgain(editTextEmail, "Please put in your email address")
-            } else if (!email.isEmailValid()) {
-                inputAgain(editTextEmail, "Please enter a valid email address")
-            } else if (password.isEmpty()) {
-                inputAgain(editTextPassword, "Please put in your password")
-            } else if (!password.isPasswordValid()) {
-                inputAgain(editTextPassword, "Password must be at least 8 characters and contain at least a number, uppercase letter and lowercase letter")
-            } else {
-                user = hashMapOf<String, String>(
-                    "firstName" to firstName,
-                    "email" to email
-                )
-
-                //createUserAndSendEmail()
-
-                Log.i("RegisterActivity: ", "we hit the else!")
-
-
+            if (isInputValid(firstName, email, password)) {
+                val user = User(auth.currentUser.uid, firstName, email, emptyList())
+                createUserAndSendEmail(user)
             }
+        }
+    }
+
+    private fun isInputValid(name: String, email: String, password: String): Boolean {
+        if (name.isEmpty()) {
+            inputAgain(editTextFirstName, "Please put in your first name")
+        } else if (email.isEmpty()) {
+            inputAgain(editTextEmail, "Please put in your email address")
+        } else if (!email.isEmailValid()) {
+            inputAgain(editTextEmail, "Please enter a valid email address")
+        } else if (password.isEmpty()) {
+            inputAgain(editTextPassword, "Please put in your password")
+        } else if (!password.isPasswordValid()) {
+            inputAgain(
+                editTextPassword,
+                "Password must be at least 8 characters and contain at least a number, uppercase letter and lowercase letter"
+            )
+        } else {
+            return true
+        }
+        return false
+    }
+
+    public override fun onStart() {
+        super.onStart()
+        // Check if user is signed in (non-null) and update UI accordingly.
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            //add code to go to somewhere
         }
     }
 
@@ -116,45 +122,45 @@ class RegisterActivity : AppCompatActivity() {
 
     //Checks if email is valid
     private fun String.isEmailValid(): Boolean {
-        return !TextUtils.isEmpty(this) && android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
+        return !TextUtils.isEmpty(this) && android.util.Patterns.EMAIL_ADDRESS.matcher(this)
+            .matches()
     }
 
-   /* private fun addUserToDatabase() {
-        uid = auth.currentUser!!.uid
-        db.collection("users")
-            .document(uid).set(user)
-            .addOnSuccessListener {
-                Log.d("RegisterActivity: ", "DocumentSnapshot added with ID: $uid")
-                auth.signOut()
-            }
-            .addOnFailureListener { e ->
-                Log.w("RegisterActivity: ", "Error adding document", e)
-            }
+    private fun addUserToDatabase(user: User) {
+         db.collection("users")
+             .document(user.userID!!).set(user)
+             .addOnSuccessListener {
+                 Log.d("RegisterActivity: ", "DocumentSnapshot added with ID: ${user.userID}")
+                 auth.signOut()
+             }
+             .addOnFailureListener { e ->
+                 Log.w("RegisterActivity: ", "Error adding document", e)
+             }
 
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
-    }
+         val intent = Intent(this, LoginActivity::class.java)
+         startActivity(intent)
+     }
 
-    private fun createUserAndSendEmail() {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    auth.currentUser?.sendEmailVerification()
-                        ?.addOnCompleteListener(this) {
-                            if (task.isSuccessful) {
-                                toast("A verification email has been sent")
-                                addUserToDatabase()
-                            }
-                        }
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(TAG, "createUserWithEmail:success")
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
-                    Toast.makeText(baseContext, "Authentication failed.",
-                        Toast.LENGTH_SHORT).show()
-                }
-            }
-    } */
+     private fun createUserAndSendEmail(user: User) {
+         auth.createUserWithEmailAndPassword(email, password)
+             .addOnCompleteListener(this) { task ->
+                 if (task.isSuccessful) {
+                     auth.currentUser?.sendEmailVerification()
+                         ?.addOnSuccessListener (this) {
+                             if (task.isSuccessful) {
+                                 toast("A verification email has been sent")
+                                 addUserToDatabase(user)
+                             }
+                         }
+                     // Sign in success, update UI with the signed-in user's information
+                     Log.d(TAG, "createUserWithEmail:success")
+                 } else {
+                     // If sign in fails, display a message to the user.
+                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
+                     Toast.makeText(baseContext, "Authentication failed.",
+                         Toast.LENGTH_SHORT).show()
+                 }
+             }
+     }
 
 }

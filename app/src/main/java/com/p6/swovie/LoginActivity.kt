@@ -28,9 +28,6 @@ class LoginActivity : AppCompatActivity() {
     lateinit var editTextEmail: EditText
     lateinit var editTextPassword: EditText
 
-
-    //var auth: FirebaseAuth = Firebase.auth
-
     private var cancellationSignal: CancellationSignal? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,10 +45,6 @@ class LoginActivity : AppCompatActivity() {
         }
 
 
-//        if (auth.currentUser != null) {
-//            editTextEmail.text = auth.currentUser.email.toString()
-//        }
-
         val buttonLogIn = findViewById<Button>(R.id.button_login)
         buttonLogIn?.setOnClickListener()
         {
@@ -60,33 +53,8 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 email = editTextEmail.text.toString().trim()
                 password = editTextPassword.text.toString().trim()
-                //if (email != auth.currentUser.email.toString()) {
-                //    Log.i("EMAIL", "HELLO")
-                //    resetSharedPreferences()
+
             }
-            //Check if credentials match and user has verified their email,
-            /*auth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(this) { task ->
-                            if (task.isSuccessful) {
-                                Log.d(TAG, "signInWithEmail:success")
-                                val user = auth.currentUser
-                                if (user != null) {
-                                    if (user.isEmailVerified) {
-                                        Log.i(TAG, "email is verified")
-                                        val intent = Intent(this, MainActivity::class.java)
-                                        startActivity(intent)
-                                    } else {
-                                        toast("Please verify your email")
-                                    }
-                                }
-                            } else {
-                                // If sign in fails, display a message to the user.
-                                Log.w(TAG, "signInWithEmail:failure", task.exception)
-                                toast("Authentication failed")
-                            }
-                        }
-            }
- */
         }
     }
 
