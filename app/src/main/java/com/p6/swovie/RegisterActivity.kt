@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
@@ -28,6 +29,8 @@ class RegisterActivity : AppCompatActivity() {
     lateinit var editTextFirstName: EditText
     lateinit var editTextEmail: EditText
     lateinit var editTextPassword: EditText
+    lateinit var userID: String
+    lateinit var user: User
 
     lateinit var email: String
     lateinit var password: String
@@ -60,8 +63,7 @@ class RegisterActivity : AppCompatActivity() {
             password = editTextPassword.text.toString().trim()
 
             if (isInputValid(firstName, email, password)) {
-                val user = User(auth.currentUser.uid, firstName, email, emptyList())
-                createUserAndSendEmail(user)
+                createUserAndSendEmail()
             }
         }
     }
@@ -126,11 +128,12 @@ class RegisterActivity : AppCompatActivity() {
             .matches()
     }
 
-    private fun addUserToDatabase(user: User) {
+    private fun addUserToDatabase() {
+        user = User(userID, firstName, email, emptyList())
          db.collection("users")
-             .document(user.userID!!).set(user)
+             .document(userID).set(user)
              .addOnSuccessListener {
-                 Log.d("RegisterActivity: ", "DocumentSnapshot added with ID: ${user.userID}")
+                 Log.d("RegisterActivity: ", "DocumentSnapshot added with ID: $userID")
                  auth.signOut()
              }
              .addOnFailureListener { e ->
@@ -141,15 +144,16 @@ class RegisterActivity : AppCompatActivity() {
          startActivity(intent)
      }
 
-     private fun createUserAndSendEmail(user: User) {
+     private fun createUserAndSendEmail() {
          auth.createUserWithEmailAndPassword(email, password)
              .addOnCompleteListener(this) { task ->
                  if (task.isSuccessful) {
+                     userID = auth.currentUser!!.uid
                      auth.currentUser?.sendEmailVerification()
                          ?.addOnSuccessListener (this) {
                              if (task.isSuccessful) {
                                  toast("A verification email has been sent")
-                                 addUserToDatabase(user)
+                                 addUserToDatabase()
                              }
                          }
                      // Sign in success, update UI with the signed-in user's information

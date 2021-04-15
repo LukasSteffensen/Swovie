@@ -10,6 +10,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CancellationSignal
+import android.util.Log
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
@@ -20,7 +21,7 @@ import com.google.firebase.ktx.Firebase
 class LoginActivity : AppCompatActivity() {
 
     private val TAG = "LoginActivity"
-
+    private lateinit var auth: FirebaseAuth
 
     lateinit var email: String
     lateinit var password: String
@@ -33,6 +34,9 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        // Initialize Firebase Auth
+        auth = Firebase.auth
 
         val textViewRegister = findViewById<TextView>(R.id.button_register)
 
@@ -53,7 +57,22 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 email = editTextEmail.text.toString().trim()
                 password = editTextPassword.text.toString().trim()
-
+                auth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this) { task ->
+                        if (task.isSuccessful) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInWithEmail:success")
+                            val user = auth.currentUser
+                            val intent = Intent(this, MainActivity::class.java)
+                            intent.putExtra("user", user)
+                            startActivity(intent)
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithEmail:failure", task.exception)
+                            Toast.makeText(baseContext, "Authentication failed.",
+                                Toast.LENGTH_SHORT).show()
+                        }
+                    }
             }
         }
     }
