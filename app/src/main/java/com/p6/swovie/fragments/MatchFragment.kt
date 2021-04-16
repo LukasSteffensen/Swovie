@@ -26,9 +26,9 @@ class MatchFragment : Fragment(), View.OnClickListener {
     private lateinit var buttonJoin: Button
     private lateinit var editTextCode: EditText
     private lateinit var uid: String
+    private var isInGroup: Boolean = false
     var auth: FirebaseAuth = Firebase.auth
     val db = Firebase.firestore
-    private lateinit var group: HashMap<String, String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,10 +39,22 @@ class MatchFragment : Fragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_match, container, false)
+        val root2 = inflater.inflate(R.layout.fragment_match2, container, false)
 
         buttonCreate = root.findViewById(R.id.button_create_group)
         buttonJoin = root.findViewById(R.id.button_join_group)
         editTextCode = root.findViewById(R.id.editText_groupcode)
+
+        isInGroup() // Code in here for when user is in a group
+        if (isInGroup) {
+
+            //Make adapter n shit sometime
+
+
+
+            return root2
+        }
+
 
 
 
@@ -51,7 +63,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
         when (view) {
-            buttonCreate -> Toast.makeText(activity, "Create", Toast.LENGTH_SHORT).show()
+            buttonCreate -> createGroup()
             buttonJoin -> joinGroup(editTextCode.text)
         }
     }
@@ -65,21 +77,25 @@ class MatchFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    /*private fun createGroup(){
+    private fun createGroup(){
 
-        group = hashMapOf<String, String>(
-            "users" to user
+        val group = hashMapOf(
+                "name" to "Los Angeles",
+                "state" to "CA",
+                "country" to "USA"
         )
 
-        uid = auth.currentUser!!.uid
-        db.collection("users")
-            .document(uid).set(user)
-            .addOnSuccessListener {
-                Log.d("RegisterActivity: ", "DocumentSnapshot added with ID: $uid")
-                auth.signOut()
+        db.collection("rooms")
+            .add(group)
+            .addOnSuccessListener { documentReference ->
+                Log.d("MatchFragment", "DocumentSnapshot written with ID: ${documentReference.id}")
+                toast("works")
             }
-
-    }*/
+            .addOnFailureListener { e ->
+                Log.w("MatchFragment", "Error adding document", e)
+                toast("not works")
+            }
+    }
 
     /*private fun inputAgain(editText: EditText, toast: String) {
         editText.requestFocus()
@@ -93,8 +109,17 @@ class MatchFragment : Fragment(), View.OnClickListener {
         Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
     }
 
-    private fun isInGroup(){
-
+    private fun isInGroup() {
+        val user = Firebase.auth.currentUser
+        db.collection("rooms")
+            .whereEqualTo("user", user)
+            .get()
+            .addOnSuccessListener { documents ->
+                isInGroup = true
+            }
+            .addOnFailureListener { exception ->
+                isInGroup = false
+            }
     }
 
 }
