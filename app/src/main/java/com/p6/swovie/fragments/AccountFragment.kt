@@ -55,10 +55,6 @@ class AccountFragment : Fragment(), View.OnClickListener {
         return root
     }
 
-    fun signOut() {
-        //Firebase.auth.signOut()
-    }
-
     override fun onClick(view: View?) { // All OnClick buttons, with strings depending on button
         when (view) {
             buttonResetSwipes -> alert(getString(R.string.resetswipes), getString(R.string.alertswipes), buttonResetSwipes)
@@ -72,7 +68,7 @@ class AccountFragment : Fragment(), View.OnClickListener {
         builder.setTitle(title)
         builder.setMessage(message)
         builder.setPositiveButton(R.string.alertyes) { dialogInterface, which ->
-            when (button) {
+            when (button) { // based on buttons, when pressed yes do the action
                 buttonLogout -> { logOut() }
                 buttonResetPassword -> { resetPassword() }
                 buttonResetSwipes -> { Toast.makeText(activity, "Reset all swipes clicked yes", Toast.LENGTH_LONG).show() }
