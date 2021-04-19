@@ -18,6 +18,8 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.p6.swovie.R
+import kotlinx.coroutines.tasks.await
+import okhttp3.internal.wait
 import java.util.HashMap
 
 class MatchFragment : Fragment(), View.OnClickListener {
@@ -26,7 +28,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
     private lateinit var buttonJoin: Button
     private lateinit var editTextCode: EditText
     private lateinit var uid: String
-    private var isInGroup: Boolean = false
+    private var isInGroup = false
     var auth: FirebaseAuth = Firebase.auth
     val db = Firebase.firestore
 
@@ -46,9 +48,12 @@ class MatchFragment : Fragment(), View.OnClickListener {
         editTextCode = root.findViewById(R.id.editText_groupcode)
 
         isInGroup() // Code in here for when user is in a group
+
         if (isInGroup) {
 
             //Make adapter n shit sometime
+
+            //Doesnt work at the moment
 
 
 
@@ -58,7 +63,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
 
 
-        return root
+        return root2
     }
 
     override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
@@ -81,8 +86,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
         val group = hashMapOf(
                 "name" to "Los Angeles",
-                "state" to "CA",
-                "country" to "USA"
+                "email" to "m@m.com"
         )
 
         db.collection("rooms")
@@ -112,13 +116,13 @@ class MatchFragment : Fragment(), View.OnClickListener {
     private fun isInGroup() {
         val user = Firebase.auth.currentUser
         db.collection("rooms")
-            .whereEqualTo("user", user)
+            .whereEqualTo("users", user.uid)
             .get()
             .addOnSuccessListener { documents ->
-                isInGroup = true
+                isInGroup = !documents.isEmpty
             }
             .addOnFailureListener { exception ->
-                isInGroup = false
+                Log.e("MatchFragment", "Error with Auth")
             }
     }
 
