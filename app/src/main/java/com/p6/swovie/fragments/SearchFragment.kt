@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.p6.swovie.*
@@ -17,7 +18,8 @@ import com.p6.swovie.*
 class SearchFragment : Fragment() {
 
     private lateinit var buttonSearch: Button
-    private lateinit var popularMovies: RecyclerView
+    private lateinit var moviesRecyclerView: RecyclerView
+    private lateinit var gridLayoutManager: GridLayoutManager
     private lateinit var popularMoviesAdapter: MoviesAdapter
     private lateinit var popularMoviesLayoutMgr: LinearLayoutManager
     private var popularMoviesPage = 1
@@ -34,11 +36,13 @@ class SearchFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_search, container, false)
 
         //Showing popular movies in RecyclerView (scrollable, vertical)
-        popularMovies = root.findViewById(R.id.recyclerView_movies)
+        moviesRecyclerView = root.findViewById(R.id.recyclerView_movies)
+        gridLayoutManager = GridLayoutManager(context, 3, LinearLayoutManager.VERTICAL, false)
         popularMoviesLayoutMgr = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-        popularMovies.layoutManager = popularMoviesLayoutMgr
+        moviesRecyclerView.layoutManager = gridLayoutManager
+
         popularMoviesAdapter = MoviesAdapter(mutableListOf()) { movie -> showMovieDetails(movie) }
-        popularMovies.adapter = popularMoviesAdapter
+        moviesRecyclerView.adapter = popularMoviesAdapter
 
         getPopularMovies()
 
@@ -46,7 +50,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun attachPopularMoviesOnScrollListener() { //Basicly updates when scolling, showing movies as you scroll
-        popularMovies.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        moviesRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             val totalItemCount =
                 popularMoviesLayoutMgr.itemCount //the total number of movies inside our popularMoviesAdapter. This will keep increasing the more we call popularMoviesAdapter.appendMovies().
@@ -56,7 +60,7 @@ class SearchFragment : Fragment() {
                 popularMoviesLayoutMgr.findFirstVisibleItemPosition() // is the position of the leftmost visible item in our list.
 
             if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
-                popularMovies.removeOnScrollListener(this)
+                moviesRecyclerView.removeOnScrollListener(this)
                 popularMoviesPage++
                 getPopularMovies()
             }
