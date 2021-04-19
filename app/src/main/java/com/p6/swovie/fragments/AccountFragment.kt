@@ -104,7 +104,5 @@ class AccountFragment : Fragment(), View.OnClickListener {
                     }
             }
         }
-
     }
-
 }

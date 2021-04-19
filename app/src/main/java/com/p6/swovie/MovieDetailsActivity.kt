@@ -1,5 +1,6 @@
 package com.p6.swovie
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -37,6 +38,8 @@ override fun onCreate(savedInstanceState: Bundle?) {
     imageViewMovieDetails = findViewById(R.id.imageView_movie_details)
     textViewTitleDetails = findViewById(R.id.textView_title_details)
     textViewDescriptionDetails = findViewById(R.id.textView_description_details)
+
+    textViewDescriptionDetails.movementMethod = ScrollingMovementMethod()
 
     val extras = intent.extras
 
