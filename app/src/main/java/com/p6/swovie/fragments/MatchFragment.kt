@@ -1,5 +1,6 @@
 package com.p6.swovie.fragments
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
@@ -26,6 +27,8 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
     private lateinit var buttonCreate: Button
     private lateinit var buttonJoin: Button
+    private lateinit var buttonLeave: Button
+    private lateinit var buttonViewMembers: Button
     private lateinit var editTextCode: EditText
     private lateinit var uid: String
     private var isInGroup = false
@@ -41,13 +44,18 @@ class MatchFragment : Fragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_match, container, false)
-        val root2 = inflater.inflate(R.layout.fragment_match2, container, false)
+        //val root2 = inflater.inflate(R.layout.fragment_match2, container, false)
 
+        //Components in not-in-a-group screen
         buttonCreate = root.findViewById(R.id.button_create_group)
         buttonJoin = root.findViewById(R.id.button_join_group)
         editTextCode = root.findViewById(R.id.editText_groupcode)
 
-        isInGroup() // Code in here for when user is in a group
+        //Components for in-a-group screen
+        //buttonViewMembers = root2.findViewById(R.id.button_view_members)
+        //buttonLeave = root2.findViewById(R.id.button_leave_group)
+
+        /*isInGroup() // Code in here for when user is in a group
 
         if (isInGroup) {
 
@@ -59,19 +67,22 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
             return root2
         }
+*/
 
 
 
-
-        return root2
+        return root
     }
 
     override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
         when (view) {
             buttonCreate -> createGroup()
             buttonJoin -> joinGroup(editTextCode.text)
+            buttonLeave -> alert(getString(R.string.leavegroup), getString(R.string.alertleavegroup))
+            buttonViewMembers -> toast("Clicked View Members")
         }
     }
+
 
     private fun joinGroup(text: Editable) {
         if (text.isEmpty()) {
@@ -124,6 +135,21 @@ class MatchFragment : Fragment(), View.OnClickListener {
             .addOnFailureListener { exception ->
                 Log.e("MatchFragment", "Error with Auth")
             }
+    }
+
+    private fun alert(title: String, message: String){ //Making an alert dialog
+        val builder = AlertDialog.Builder(activity)
+        builder.setTitle(title)
+        builder.setMessage(message)
+        builder.setPositiveButton(R.string.alertyes) { dialogInterface, which ->
+            toast("left group")
+        }
+        builder.setNeutralButton(R.string.alertcancel){dialogInterface , which ->
+        }
+
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.setCancelable(false)
+        alertDialog.show()
     }
 
 }
