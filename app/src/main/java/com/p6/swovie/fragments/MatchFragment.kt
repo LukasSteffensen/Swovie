@@ -22,6 +22,8 @@ import java.util.HashMap
 
 class MatchFragment : Fragment(), View.OnClickListener {
 
+    private var TAG = "MatchFragment"
+
     private lateinit var buttonCreate: Button
     private lateinit var buttonJoin: Button
     private lateinit var editTextCode: EditText
@@ -29,10 +31,6 @@ class MatchFragment : Fragment(), View.OnClickListener {
     var auth: FirebaseAuth = Firebase.auth
     val db = Firebase.firestore
     private lateinit var group: HashMap<String, String>
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,7 +42,8 @@ class MatchFragment : Fragment(), View.OnClickListener {
         buttonJoin = root.findViewById(R.id.button_join_group)
         editTextCode = root.findViewById(R.id.editText_groupcode)
 
-
+        buttonCreate.setOnClickListener(this)
+        buttonJoin.setOnClickListener(this)
 
         return root
     }
@@ -52,14 +51,14 @@ class MatchFragment : Fragment(), View.OnClickListener {
     override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
         when (view) {
             buttonCreate -> Toast.makeText(activity, "Create", Toast.LENGTH_SHORT).show()
-            buttonJoin -> joinGroup(editTextCode.text)
+            buttonJoin -> joinGroup(editTextCode.text.toString())
         }
     }
 
-    private fun joinGroup(text: Editable) {
+    private fun joinGroup(text: String) {
+        Log.i(TAG, "hi")
         if (text.isEmpty()) {
-            toast("Please put in a group code")
-            //inputAgain(editTextCode, "Please put in a group code")
+            inputAgain(editTextCode, "Please put in a group code")
         } else {
             toast("Group joined")
         }
@@ -81,13 +80,13 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
     }*/
 
-    /*private fun inputAgain(editText: EditText, toast: String) {
+    private fun inputAgain(editText: EditText, toast: String) {
         editText.requestFocus()
         val imm: InputMethodManager =
-            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
         toast(toast)
-    }*/
+    }
 
     private fun toast(message: String) {
         Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
