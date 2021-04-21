@@ -60,7 +60,7 @@ class AccountFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(view: View?) { // All OnClick buttons, with strings depending on button
         when (view) {
-            buttonResetSwipes -> Log.i(TAG,generateGroupId())//alert(getString(R.string.resetswipes), getString(R.string.alertswipes), buttonResetSwipes)
+            buttonResetSwipes -> alert(getString(R.string.resetswipes), getString(R.string.alertswipes), buttonResetSwipes)
             buttonResetPassword -> alert(getString(R.string.resetpassword), getString(R.string.alertpassword), buttonResetPassword)
             buttonLogout -> alert(getString(R.string.logout), getString(R.string.alertlogout), buttonLogout)
         }
@@ -101,11 +101,16 @@ class AccountFragment : Fragment(), View.OnClickListener {
                 Firebase.auth.sendPasswordResetEmail(email)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
+                            toast("An email has been sent with a link to reset your password")
 
+                            Log.d(TAG, "Email sent.")
                         }
-                        Log.d("AccountFragment", "Email sent.")
                     }
             }
         }
+    }
+
+    private fun toast(message: String) {
+        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
     }
 }

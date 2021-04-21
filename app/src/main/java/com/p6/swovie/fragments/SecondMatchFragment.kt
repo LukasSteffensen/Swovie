@@ -26,6 +26,8 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
 
     private lateinit var buttonCreate: Button
 
+    private val matchFragment = MatchFragment()
+
     private lateinit var buttonJoin: Button
     private lateinit var buttonViewMembers: Button
     private lateinit var buttonLeave: Button
@@ -77,5 +79,12 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
 
     private fun toast(message: String) {
         Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        activity?.supportFragmentManager?.beginTransaction()?.apply {
+            replace(R.id.fl_wrapper, fragment)
+            commit()
+        }
     }
 }

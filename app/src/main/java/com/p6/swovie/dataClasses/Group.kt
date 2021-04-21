@@ -9,8 +9,8 @@ val STRING_LENGTH = 4
 val ALPHANUMERIC_REGEX = "[A-Z0-9]+"
 
 data class Group (
-    val userIDs: List<String>? = null,
-    val swipedGroupMovieIDs: List<String>? = null
+    val userIDs: ArrayList<String>? = null,
+    //val swipedMovieIDs: HashMap<String, List<String>>
 )
 
 fun generateGroupId(): String {

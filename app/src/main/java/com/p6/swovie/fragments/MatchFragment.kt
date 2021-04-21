@@ -2,6 +2,7 @@ package com.p6.swovie.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.text.TextUtils.replace
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,12 +18,18 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.p6.swovie.R
+import com.p6.swovie.dataClasses.Group
+import com.p6.swovie.dataClasses.generateGroupId
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 class MatchFragment : Fragment(), View.OnClickListener {
 
     private val TAG = "MatchFragment"
+
+    private val secondMatchFragment = SecondMatchFragment()
 
     private lateinit var buttonCreate: Button
     private lateinit var buttonJoin: Button
@@ -34,7 +41,6 @@ class MatchFragment : Fragment(), View.OnClickListener {
     private var isInGroup = false
     var auth: FirebaseAuth = Firebase.auth
     val db = Firebase.firestore
-    private lateinit var group: HashMap<String, String>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,8 +64,8 @@ class MatchFragment : Fragment(), View.OnClickListener {
     override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
         when (view) {
             buttonCreate -> {
-                Toast.makeText(activity, "Create", Toast.LENGTH_SHORT).show()
-                refreshFragment()
+                createGroup()
+                replaceFragment(secondMatchFragment)
             }
             buttonJoin -> joinGroup(editTextCode.text.toString())
         }
@@ -78,21 +84,23 @@ class MatchFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    /*private fun createGroup(){
+    private fun createGroup(){
 
-        group = hashMapOf<String, String>(
-            "users" to user
-        )
+        val userIdList: ArrayList<String> = ArrayList()
 
-        uid = auth.currentUser!!.uid
-        db.collection("users")
-            .document(uid).set(user)
+        val groupCode = generateGroupId()
+
+        userIdList.add(auth.currentUser.uid)
+
+        val group = Group(userIdList)
+
+        db.collection("rooms")
+            .document(groupCode).set(group)
             .addOnSuccessListener {
-                Log.d("RegisterActivity: ", "DocumentSnapshot added with ID: $uid")
-                auth.signOut()
+                Log.d("RegisterActivity: ", "DocumentSnapshot added with ID: $groupCode")
             }
 
-    }*/
+    }
 
     private fun inputAgain(editText: EditText, toast: String) {
         editText.requestFocus()
@@ -105,4 +113,20 @@ class MatchFragment : Fragment(), View.OnClickListener {
     private fun toast(message: String) {
         Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
     }
+
+    private fun replaceFragment(fragment: Fragment) {
+        activity?.supportFragmentManager?.beginTransaction()?.apply {
+            replace(R.id.fl_wrapper, fragment)
+            commit()
+        }
+    }
+    // making hashmap of movie ID containing arrays of user IDs for each type of swipe
+    //        val swipedMovieId = hashMapOf<String, List<String>>(
+//            "userSuperLike" to emptyList<String>(),
+//            "userLike" to emptyList<String>(),
+//            "userNotToday" to emptyList<String>(),
+//            "userNever" to emptyList<String>(),
+//        )
+
+
 }
