@@ -13,7 +13,7 @@ import com.p6.swovie.fragments.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val TAG: String = "SecondMatchFragment"
+    private val TAG: String = "MainActivity"
 
     private val movieFragment = MovieFragment()
     private val matchFragment = MatchFragment()
@@ -37,8 +37,9 @@ class MainActivity : AppCompatActivity() {
         if(auth.currentUser != null) {
             db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
                 .addOnSuccessListener { document ->
-                    isInGroup = document != null
+                    isInGroup = !document.isEmpty
                     bottomNavigation.isClickable = true
+                    Log.i(TAG, "isInGroup is True")
                 }
                 .addOnFailureListener { exception ->
                     Log.d(TAG, "get failed with ", exception)
@@ -54,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         if (item.itemId == R.id.ic_movie){
             replaceFragment(movieFragment)
         } else if (item.itemId == R.id.ic_match){
-            if(!isInGroup){
+            if(isInGroup){
                 replaceFragment(secondMatchFragment)
             } else {
                 replaceFragment(matchFragment)
