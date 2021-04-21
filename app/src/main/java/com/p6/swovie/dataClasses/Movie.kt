@@ -1,4 +1,4 @@
-package com.p6.swovie
+package com.p6.swovie.dataClasses
 
 import com.google.gson.annotations.SerializedName
 import org.json.JSONObject

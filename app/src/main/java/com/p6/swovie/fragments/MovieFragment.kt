@@ -1,9 +1,7 @@
 package com.p6.swovie.fragments
 
-import android.R.attr.fragment
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextUtils.replace
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,9 +11,8 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.p6.swovie.*
+import com.p6.swovie.dataClasses.Movie
 import okhttp3.OkHttpClient
-import java.lang.reflect.Array.newInstance
-import java.net.URLClassLoader.newInstance
 
 
 class MovieFragment : Fragment(), View.OnClickListener {

@@ -7,6 +7,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.p6.swovie.dataClasses.Movie
 
 class MoviesAdapter (private var movies: MutableList<Movie>, private val onMovieClick: (movie: Movie) -> Unit) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>() {
 
