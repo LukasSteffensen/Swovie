@@ -25,6 +25,7 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
     private var TAG = "MatchFragment"
 
     private lateinit var buttonCreate: Button
+
     private lateinit var buttonJoin: Button
     private lateinit var buttonViewMembers: Button
     private lateinit var buttonLeave: Button
