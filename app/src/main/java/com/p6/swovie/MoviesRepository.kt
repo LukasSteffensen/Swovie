@@ -1,7 +1,7 @@
 package com.p6.swovie
 
 
-import android.util.Log
+import com.p6.swovie.dataClasses.Movie
 
 import retrofit2.Call
 import retrofit2.Callback

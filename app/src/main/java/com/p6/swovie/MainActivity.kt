@@ -2,41 +2,69 @@ package com.p6.swovie
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.p6.swovie.fragments.AccountFragment
-import com.p6.swovie.fragments.MatchFragment
-import com.p6.swovie.fragments.MovieFragment
-import com.p6.swovie.fragments.SearchFragment
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.p6.swovie.fragments.*
 
 class MainActivity : AppCompatActivity() {
 
+    private val TAG: String = "SecondMatchFragment"
+
     private val movieFragment = MovieFragment()
     private val matchFragment = MatchFragment()
+    private val secondMatchFragment = SecondMatchFragment()
     private val searchFragment = SearchFragment()
     private val accountFragment = AccountFragment()
+    private var isInGroup: Boolean = false
+
+    private var auth: FirebaseAuth = Firebase.auth
+    private val db = Firebase.firestore
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         replaceFragment(movieFragment)
-
         val bottomNavigation: BottomNavigationView = findViewById(R.id.navigation_bar)
+
+        bottomNavigation.isClickable = false
+
+        if(auth.currentUser != null) {
+            db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
+                .addOnSuccessListener { document ->
+                    isInGroup = document != null
+                    bottomNavigation.isClickable = true
+                }
+                .addOnFailureListener { exception ->
+                    Log.d(TAG, "get failed with ", exception)
+                }
+        }
+
+
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
     }
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        when (item.itemId) {
-            R.id.ic_movie -> replaceFragment(movieFragment)
-            R.id.ic_match -> replaceFragment(matchFragment)
-            R.id.ic_search -> replaceFragment(searchFragment)
-            R.id.ic_account -> replaceFragment(accountFragment)
-
+        if (item.itemId == R.id.ic_movie){
+            replaceFragment(movieFragment)
+        } else if (item.itemId == R.id.ic_match){
+            if(!isInGroup){
+                replaceFragment(secondMatchFragment)
+            } else {
+                replaceFragment(matchFragment)
+            }
+        } else if (item.itemId == R.id.ic_search){
+            replaceFragment(searchFragment)
+        } else if (item.itemId == R.id.ic_account){
+            replaceFragment(accountFragment)
         }
         true
-
     }
 
     private fun replaceFragment(fragment: Fragment) {

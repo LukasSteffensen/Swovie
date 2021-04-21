@@ -38,5 +38,4 @@
         android:text="@string/movie"
         android:textSize="16sp" />
 
-
 </androidx.appcompat.widget.LinearLayoutCompat>

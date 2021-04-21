@@ -20,7 +20,7 @@ import com.p6.swovie.R
 import java.util.*
 
 
-class MatchFragment : Fragment(), View.OnClickListener {
+class SecondMatchFragment : Fragment(), View.OnClickListener {
 
     private var TAG = "MatchFragment"
 
@@ -40,59 +40,31 @@ class MatchFragment : Fragment(), View.OnClickListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_match, container, false)
-
-        //Components from fragment_match layout
-        buttonCreate = root.findViewById(R.id.button_create_group)
-        buttonJoin = root.findViewById(R.id.button_join_group)
-        editTextCode = root.findViewById(R.id.editText_groupcode)
-
+        val root = inflater.inflate(R.layout.fragment_match2, container, false)
+        //Components from fragment_match2 layout
+        buttonViewMembers = root.findViewById(R.id.button_view_members)
+        buttonLeave = root.findViewById(R.id.button_leave_group)
 
         //Click listeners, makes onClick methods possible
-        buttonCreate.setOnClickListener(this)
-        buttonJoin.setOnClickListener(this)
+        buttonViewMembers.setOnClickListener(this)
+        buttonLeave.setOnClickListener(this)
 
         return root
     }
 
     override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
         when (view) {
-            buttonCreate -> {
-                Toast.makeText(activity, "Create", Toast.LENGTH_SHORT).show()
+            buttonViewMembers -> Toast.makeText(activity, "ViewMembers", Toast.LENGTH_SHORT).show()
+            buttonLeave -> {
+                Toast.makeText(activity, "Leave", Toast.LENGTH_SHORT).show()
                 refreshFragment()
             }
-            buttonJoin -> joinGroup(editTextCode.text.toString())
         }
     }
 
     private fun refreshFragment() {
         //TODO
     }
-
-    private fun joinGroup(text: String) {
-        Log.i(TAG, "hi")
-        if (text.isEmpty()) {
-            inputAgain(editTextCode, "Please put in a group code")
-        } else {
-            toast("Group joined")
-        }
-    }
-
-    /*private fun createGroup(){
-
-        group = hashMapOf<String, String>(
-            "users" to user
-        )
-
-        uid = auth.currentUser!!.uid
-        db.collection("users")
-            .document(uid).set(user)
-            .addOnSuccessListener {
-                Log.d("RegisterActivity: ", "DocumentSnapshot added with ID: $uid")
-                auth.signOut()
-            }
-
-    }*/
 
     private fun inputAgain(editText: EditText, toast: String) {
         editText.requestFocus()
