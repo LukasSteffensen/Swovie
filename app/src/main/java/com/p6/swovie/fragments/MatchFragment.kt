@@ -22,7 +22,7 @@ import java.util.*
 
 class MatchFragment : Fragment(), View.OnClickListener {
 
-    private var TAG = "MatchFragment"
+    private val TAG = "MatchFragment"
 
     private lateinit var buttonCreate: Button
     private lateinit var buttonJoin: Button

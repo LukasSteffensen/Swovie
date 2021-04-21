@@ -17,8 +17,11 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.p6.swovie.LoginActivity
 import com.p6.swovie.R
+import com.p6.swovie.dataClasses.generateGroupId
 
 class AccountFragment : Fragment(), View.OnClickListener {
+
+    private val TAG = "AccountFragment"
 
     private val JSON_URL_LOGO = "https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg"
     private lateinit var imageViewLogo: ImageView
@@ -57,7 +60,7 @@ class AccountFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(view: View?) { // All OnClick buttons, with strings depending on button
         when (view) {
-            buttonResetSwipes -> alert(getString(R.string.resetswipes), getString(R.string.alertswipes), buttonResetSwipes)
+            buttonResetSwipes -> Log.i(TAG,generateGroupId())//alert(getString(R.string.resetswipes), getString(R.string.alertswipes), buttonResetSwipes)
             buttonResetPassword -> alert(getString(R.string.resetpassword), getString(R.string.alertpassword), buttonResetPassword)
             buttonLogout -> alert(getString(R.string.logout), getString(R.string.alertlogout), buttonLogout)
         }
