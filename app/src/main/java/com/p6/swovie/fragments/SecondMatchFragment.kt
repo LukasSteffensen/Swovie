@@ -9,11 +9,13 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.p6.swovie.R
@@ -31,7 +33,9 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
     private lateinit var buttonViewMembers: Button
     private lateinit var buttonLeave: Button
     private lateinit var editTextCode: EditText
+    private lateinit var textViewGroup: TextView
     private lateinit var uid: String
+    private lateinit var groupCode: String
     private var inGroup = false
     private var isInGroup = false
     var auth: FirebaseAuth = Firebase.auth
@@ -51,14 +55,22 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
         buttonViewMembers.setOnClickListener(this)
         buttonLeave.setOnClickListener(this)
 
+        textViewGroup = root.findViewById(R.id.textView_current_group_code)
+
+        //initialize uid
+        uid = auth.currentUser.uid
+
         //get group code
-//        db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
-//            .addOnSuccessListener { document ->
-//                document.toString()
-//            }
-//            .addOnFailureListener { exception ->
-//                Log.d(TAG, "get failed with ", exception)
-//            }
+        db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
+            .addOnSuccessListener { document ->
+                groupCode = document.documents[0].id
+                Log.i(TAG, "group code: $groupCode")
+                textViewGroup.text = "Group code: $groupCode"
+            }
+            .addOnFailureListener { exception ->
+                Log.d(TAG, "get failed with ", exception)
+            }
+
 
         return root
     }
@@ -68,16 +80,16 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
             buttonViewMembers -> Toast.makeText(activity, "ViewMembers", Toast.LENGTH_SHORT).show()
             buttonLeave -> {
 
-                //trying to delete user from group
-//                val docRef = db.collection("rooms").document("BJ")
-//                val updates = hashMapOf<String, Any>(
-//                    "capital" to FieldValue.delete()
-//                )
-//
-//                docRef.update(updates).addOnCompleteListener {
+                //delete user from group
+                val docRef = db.collection("rooms").document(groupCode)
+                val updates = hashMapOf<String, Any>(
+                    "users" to FieldValue.arrayRemove(uid)
+                )
+
+                docRef.update(updates).addOnCompleteListener {
                     matchFragment = MatchFragment()
                     replaceFragment(matchFragment)
-//                }
+                }
                 //TODO Delete user's swipes from the group in firestore
             }
         }

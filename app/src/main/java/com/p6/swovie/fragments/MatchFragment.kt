@@ -11,10 +11,12 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.p6.swovie.R
@@ -37,6 +39,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
     private lateinit var buttonLeave: Button
     private lateinit var editTextCode: EditText
     private lateinit var uid: String
+    private lateinit var groupCode: String
     private var inGroup = false
     private var isInGroup = false
     var auth: FirebaseAuth = Firebase.auth
@@ -54,10 +57,18 @@ class MatchFragment : Fragment(), View.OnClickListener {
         editTextCode = root.findViewById(R.id.editText_groupcode)
 
 
+        //initialize uid
+        uid = auth.currentUser.uid
+
         //Click listeners, makes onClick methods possible
         buttonCreate.setOnClickListener(this)
         buttonJoin.setOnClickListener(this)
 
+        editTextCode.addTextChangedListener {
+            if (editTextCode.text.length==4) {
+                joinGroup(editTextCode.text.toString().toUpperCase())
+            }
+        }
         return root
     }
 
@@ -67,16 +78,24 @@ class MatchFragment : Fragment(), View.OnClickListener {
                 createGroup()
                 replaceFragment(secondMatchFragment)
             }
-            buttonJoin -> joinGroup(editTextCode.text.toString())
+            buttonJoin -> joinGroup(editTextCode.text.toString().toUpperCase())
         }
     }
 
     private fun joinGroup(text: String) {
-        Log.i(TAG, "hi")
         if (text.isEmpty()) {
             inputAgain(editTextCode, "Please put in a group code")
         } else {
-            toast("Group joined")
+            groupCode = text
+            val docRef = db.collection("rooms").document(groupCode)
+            val updates = hashMapOf<String, Any>(
+                "users" to FieldValue.arrayUnion(uid)
+            )
+            docRef.update(updates).addOnSuccessListener {
+                replaceFragment(secondMatchFragment)
+            }.addOnFailureListener {
+                    inputAgain(editTextCode,"Incorrect group code")
+                }
         }
     }
 
@@ -86,7 +105,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
         val groupCode = generateGroupId()
 
-        userIdList.add(auth.currentUser.uid)
+        userIdList.add(uid)
 
         val group = Group(userIdList)
 
