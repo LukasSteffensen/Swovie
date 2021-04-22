@@ -71,10 +71,6 @@ class MatchFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    private fun refreshFragment() {
-        //TODO
-    }
-
     private fun joinGroup(text: String) {
         Log.i(TAG, "hi")
         if (text.isEmpty()) {

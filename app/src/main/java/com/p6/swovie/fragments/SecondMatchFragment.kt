@@ -22,11 +22,10 @@ import java.util.*
 
 class SecondMatchFragment : Fragment(), View.OnClickListener {
 
-    private var TAG = "MatchFragment"
+    private var TAG = "SecondMatchFragment"
 
     private lateinit var buttonCreate: Button
-
-    private val matchFragment = MatchFragment()
+    private lateinit var matchFragment: Fragment
 
     private lateinit var buttonJoin: Button
     private lateinit var buttonViewMembers: Button
@@ -52,6 +51,15 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
         buttonViewMembers.setOnClickListener(this)
         buttonLeave.setOnClickListener(this)
 
+        //get group code
+//        db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
+//            .addOnSuccessListener { document ->
+//                document.toString()
+//            }
+//            .addOnFailureListener { exception ->
+//                Log.d(TAG, "get failed with ", exception)
+//            }
+
         return root
     }
 
@@ -59,14 +67,20 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
         when (view) {
             buttonViewMembers -> Toast.makeText(activity, "ViewMembers", Toast.LENGTH_SHORT).show()
             buttonLeave -> {
-                Toast.makeText(activity, "Leave", Toast.LENGTH_SHORT).show()
-                refreshFragment()
+
+                //trying to delete user from group
+//                val docRef = db.collection("rooms").document("BJ")
+//                val updates = hashMapOf<String, Any>(
+//                    "capital" to FieldValue.delete()
+//                )
+//
+//                docRef.update(updates).addOnCompleteListener {
+                    matchFragment = MatchFragment()
+                    replaceFragment(matchFragment)
+//                }
+                //TODO Delete user's swipes from the group in firestore
             }
         }
-    }
-
-    private fun refreshFragment() {
-        //TODO
     }
 
     private fun inputAgain(editText: EditText, toast: String) {

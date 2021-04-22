@@ -9,7 +9,7 @@ val STRING_LENGTH = 4
 val ALPHANUMERIC_REGEX = "[A-Z0-9]+"
 
 data class Group (
-    val userIDs: ArrayList<String>? = null,
+    val users: ArrayList<String>? = null,
     //val swipedMovieIDs: HashMap<String, List<String>>
 )
 
