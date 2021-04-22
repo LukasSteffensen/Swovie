@@ -26,21 +26,15 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
 
     private var TAG = "SecondMatchFragment"
 
-    private lateinit var buttonCreate: Button
     private lateinit var matchFragment: Fragment
 
-    private lateinit var buttonJoin: Button
     private lateinit var buttonViewMembers: Button
     private lateinit var buttonLeave: Button
-    private lateinit var editTextCode: EditText
     private lateinit var textViewGroup: TextView
     private lateinit var uid: String
     private lateinit var groupCode: String
-    private var inGroup = false
-    private var isInGroup = false
     var auth: FirebaseAuth = Firebase.auth
     val db = Firebase.firestore
-    private lateinit var group: HashMap<String, String>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -79,8 +73,6 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
         when (view) {
             buttonViewMembers -> Toast.makeText(activity, "ViewMembers", Toast.LENGTH_SHORT).show()
             buttonLeave -> {
-
-
                 matchFragment = MatchFragment()
                 //delete user from group
                 val docRef = db.collection("rooms").document(groupCode)
