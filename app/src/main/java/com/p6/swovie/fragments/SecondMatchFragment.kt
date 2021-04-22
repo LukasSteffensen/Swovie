@@ -80,16 +80,33 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
             buttonViewMembers -> Toast.makeText(activity, "ViewMembers", Toast.LENGTH_SHORT).show()
             buttonLeave -> {
 
+                matchFragment = MatchFragment()
                 //delete user from group
                 val docRef = db.collection("rooms").document(groupCode)
-                val updates = hashMapOf<String, Any>(
-                    "users" to FieldValue.arrayRemove(uid)
-                )
+                docRef.get()
+                    .addOnSuccessListener { document ->
+                        var array: ArrayList<String> = document.get("users") as ArrayList<String>
+                        if (array.size == 1) {
+                            docRef.delete()
+                                .addOnSuccessListener {
+                                    replaceFragment(matchFragment)
+                                    Log.d(TAG, "DocumentSnapshot successfully deleted!") }
+                                .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
+                        } else {
+                            val updates = hashMapOf<String, Any>(
+                                "users" to FieldValue.arrayRemove(uid)
+                            )
+                            docRef.update(updates).addOnCompleteListener {
+                            }
+                                .addOnFailureListener { exception ->
+                                    Log.d(TAG, "get failed with ", exception)
+                                }
+                            replaceFragment(matchFragment)
+                        }
+                    }
 
-                docRef.update(updates).addOnCompleteListener {
-                    matchFragment = MatchFragment()
-                    replaceFragment(matchFragment)
-                }
+
+
                 //TODO Delete user's swipes from the group in firestore
             }
         }
