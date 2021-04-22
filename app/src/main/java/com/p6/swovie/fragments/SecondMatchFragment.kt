@@ -104,9 +104,6 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
                             replaceFragment(matchFragment)
                         }
                     }
-
-
-
                 //TODO Delete user's swipes from the group in firestore
             }
         }
