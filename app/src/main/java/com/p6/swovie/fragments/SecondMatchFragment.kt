@@ -80,6 +80,7 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
             buttonViewMembers -> Toast.makeText(activity, "ViewMembers", Toast.LENGTH_SHORT).show()
             buttonLeave -> {
 
+
                 matchFragment = MatchFragment()
                 //delete user from group
                 val docRef = db.collection("rooms").document(groupCode)
