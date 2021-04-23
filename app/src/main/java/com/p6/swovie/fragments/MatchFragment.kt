@@ -31,7 +31,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
     private val TAG = "MatchFragment"
 
-    private val secondMatchFragment = SecondMatchFragment()
+    private lateinit var secondMatchFragment: Fragment
 
     private lateinit var buttonCreate: Button
     private lateinit var buttonJoin: Button
@@ -56,6 +56,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
         buttonJoin = root.findViewById(R.id.button_join_group)
         editTextCode = root.findViewById(R.id.editText_groupcode)
 
+        secondMatchFragment = SecondMatchFragment()
 
         //initialize uid
         uid = auth.currentUser.uid
@@ -112,7 +113,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
         db.collection("rooms")
             .document(groupCode).set(group)
             .addOnSuccessListener {
-                Log.d("RegisterActivity: ", "DocumentSnapshot added with ID: $groupCode")
+                Log.d(TAG, "DocumentSnapshot added with ID: $groupCode")
             }
 
     }
