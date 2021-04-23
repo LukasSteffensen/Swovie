@@ -46,7 +46,7 @@ class SearchFragment : Fragment() {
         return root
     }
 
-    private fun attachPopularMoviesOnScrollListener() { //Basicly updates when scolling, showing movies as you scroll
+    private fun attachPopularMoviesOnScrollListener() { //Basically updates when scrolling, showing movies as you scroll
         moviesRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             val totalItemCount =

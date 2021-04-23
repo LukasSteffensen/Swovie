@@ -32,7 +32,7 @@ class FilterDialogFragment : AppCompatActivity(), View.OnClickListener {
         filterChipGroup = findViewById(R.id.chip_group)
         filterChip1 = findViewById(R.id.chip_1)
         filterChip2 = findViewById(R.id.chip_2)
-        val filterChipListener = CompoundButton.OnCheckedChangeListener { buttonView, isChecked -> Toast.makeText(this, buttonView.id, Toast.LENGTH_LONG).show()}
+        val filterChipListener = CompoundButton.OnCheckedChangeListener { buttonView, _ -> Toast.makeText(this, buttonView.id, Toast.LENGTH_LONG).show()}
         filterChip1.setOnCheckedChangeListener(filterChipListener)
         filterChip2.setOnCheckedChangeListener(filterChipListener)
         applyButton.setOnClickListener(this)
@@ -41,7 +41,6 @@ class FilterDialogFragment : AppCompatActivity(), View.OnClickListener {
     override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
         when (view) {
             applyButton -> changeToFilters()
-
         }
     }
 

@@ -183,11 +183,5 @@ class MatchFragment : Fragment(), View.OnClickListener {
             commit()
         }
     }
-    // making hashmap of movie ID containing arrays of user IDs for each type of swipe
-    //        val swipedMovieId = hashMapOf<String, List<String>>(
-//            "userSuperLike" to emptyList<String>(),
-//            "userLike" to emptyList<String>(),
-//            "userNotToday" to emptyList<String>(),
-//            "userNever" to emptyList<String>(),
-//        )
+
 }

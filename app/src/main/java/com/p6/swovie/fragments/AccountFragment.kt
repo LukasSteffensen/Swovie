@@ -70,12 +70,12 @@ class AccountFragment : Fragment(), View.OnClickListener {
         val builder = AlertDialog.Builder(activity)
         builder.setTitle(title)
         builder.setMessage(message)
-        builder.setPositiveButton(R.string.alertyes) { dialogInterface, which ->
+        builder.setPositiveButton(R.string.alertyes) { _, _ ->
             when (button) { // based on buttons, when pressed yes do the action
                 buttonLogout -> { logOut() }
                 buttonResetPassword -> { resetPassword() }
-                buttonResetSwipes -> { Toast.makeText(activity, "Reset all swipes clicked yes", Toast.LENGTH_LONG).show() }
-                else -> { Toast.makeText(activity, "Error occurred", Toast.LENGTH_LONG).show() }
+                buttonResetSwipes -> { toast("Reset all swipes clicked yes") }
+                else -> { toast("Error occurred") }
             }
         }
         builder.setNeutralButton(R.string.alertcancel){dialogInterface , which ->

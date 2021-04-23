@@ -43,6 +43,8 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
 
     private var auth: FirebaseAuth = Firebase.auth
     private val db = Firebase.firestore
+    private lateinit var uid: String
+    private lateinit var groupCode: String
     private lateinit var cardStackView: CardStackView
 
     private lateinit var buttonNever: ImageButton
@@ -64,6 +66,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_movie, container, false)
 
+        //set isInGroup boolean
         if(auth.currentUser != null) {
             db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
                 .addOnSuccessListener { document ->
@@ -75,6 +78,18 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
                 }
         }
 
+        //initialize uid
+        uid = auth.currentUser.uid
+
+        //get group code
+        db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
+            .addOnSuccessListener { document ->
+                groupCode = document.documents[0].id
+                Log.i(TAG, "group code: $groupCode")
+            }
+            .addOnFailureListener { exception ->
+                Log.d(TAG, "get failed with ", exception)
+            }
 
         cardStackView= root.findViewById(R.id.card_stack_view)
         manager = CardStackLayoutManager(context, this)
@@ -174,32 +189,19 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
     }
 
-    private fun swipe(swipe: Int){
-        when(swipe){
-            superLike -> toast("Super like")
-            like -> toast("Like")
-            notToday -> toast("Not today")
-            never -> toast("Never")
-        }
-    }
-
-    private fun showNextMovie() {
-
-    }
-
     override fun onCardDragging(direction: Direction?, ratio: Float) {
 
     }
 
     override fun onCardSwiped(direction: Direction?) {
         if(direction == Direction.Right){
-            toast("Swiped Right")
+            swipe(like)
         } else if (direction == Direction.Left){
-            toast("Swiped Left")
+            swipe(notToday)
         } else if (direction == Direction.Top){
-            toast("Swiped Up")
+            swipe(superLike)
         } else if (direction == Direction.Bottom){
-            toast("Swiped Down")
+            swipe(never)
         }
     }
 
@@ -216,6 +218,37 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     }
 
     override fun onCardDisappeared(view: View?, position: Int) {
+
+    }
+
+    private fun swipe(swipe: Int){
+        when(swipe){
+            superLike -> saveSwipeToDatabase(swipe)
+            like -> saveSwipeToDatabase(swipe)
+            notToday -> saveSwipeToDatabase(swipe)
+            never -> saveSwipeToDatabase(swipe)
+        }
+    }
+
+    private fun saveSwipeToDatabase(swipe: Int) {
+
+        // making hashmap of movie ID containing arrays of user IDs for each type of swipe
+
+        val swipedMovieId = hashMapOf<String, Any> (
+            when(swipe) {
+                superLike -> uid to "Super like"
+                like -> uid to "Like"
+                notToday -> uid to "Not today"
+                never -> uid to "Never"
+                else -> "" to ""
+            }
+        )
+
+        db.collection("rooms")
+            .document(groupCode).update(swipedMovieId)
+            .addOnSuccessListener {
+                Log.d(TAG, "DocumentSnapshot added with ID: $groupCode")
+            }
 
     }
 }
