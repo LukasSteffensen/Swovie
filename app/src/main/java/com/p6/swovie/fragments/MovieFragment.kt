@@ -10,6 +10,10 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.p6.swovie.*
 import com.p6.swovie.dataClasses.Movie
 import okhttp3.OkHttpClient
@@ -17,9 +21,22 @@ import okhttp3.OkHttpClient
 
 class MovieFragment : Fragment(), View.OnClickListener {
 
+    private val TAG = "MovieFragment"
+
+    private var isInGroup = false
     private lateinit var imageViewMovie: ImageView
     private lateinit var textViewTitle: TextView
+    private lateinit var matchFragment: Fragment
+    private lateinit var secondMatchFragment: Fragment
     private val client = OkHttpClient()
+    private val superLike = 0
+    private val like = 1
+    private val notToday = 2
+    private val never = 3
+
+    private var auth: FirebaseAuth = Firebase.auth
+    private val db = Firebase.firestore
+
     private lateinit var buttonNever: ImageButton
     private lateinit var buttonNotToday: ImageButton
     private lateinit var buttonLike: ImageButton
@@ -47,6 +64,17 @@ class MovieFragment : Fragment(), View.OnClickListener {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_movie, container, false)
 
+        if(auth.currentUser != null) {
+            db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
+                .addOnSuccessListener { document ->
+                    isInGroup = !document.isEmpty
+                    Log.i(TAG, "isInGroup is True")
+                }
+                .addOnFailureListener { exception ->
+                    Log.d(TAG, "get failed with ", exception)
+                }
+        }
+
         // Find all components in the Fragment
         imageViewMovie = root.findViewById(R.id.imageView_movie)
         textViewTitle = root.findViewById(R.id.textView_title)
@@ -67,6 +95,8 @@ class MovieFragment : Fragment(), View.OnClickListener {
 
         buttonMatches.isEnabled = true // If user in group, Matches button will be enabled
 
+        matchFragment = MatchFragment()
+        secondMatchFragment = SecondMatchFragment()
 
         MoviesRepository.getPopularMovies(
                 onSuccess = ::onPopularMoviesFetched,
@@ -82,32 +112,26 @@ class MovieFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
         when (view) {
-            buttonLike -> Toast.makeText(activity, "Like", Toast.LENGTH_SHORT).show()
-            buttonSuperLike -> Toast.makeText(activity, "Super like", Toast.LENGTH_SHORT).show()
-            buttonNotToday -> Toast.makeText(activity, "Not today", Toast.LENGTH_SHORT).show()
-            buttonNever -> Toast.makeText(activity, "Never", Toast.LENGTH_SHORT).show()
+            buttonSuperLike -> swipe(superLike)
+            buttonLike -> swipe(like)
+            buttonNotToday -> swipe(notToday)
+            buttonNever -> swipe(never)
             buttonFilter -> changeToFilters()
-            buttonMatches -> changeToLogin()
+            buttonMatches -> if (isInGroup) {
+                replaceFragment(secondMatchFragment)
+            } else {
+                replaceFragment(matchFragment)
+            }
+
 
 
         }
-    }
-
-    private fun changeToLogin(){
-        val intent = Intent(activity, LoginActivity::class.java)
-        startActivity(intent)
     }
 
     private fun changeToFilters(){
         val intent = Intent (activity, FilterDialogFragment::class.java)
         startActivity(intent)
     }
-
-    private fun changeToMatches(){
-        val intent = Intent (activity, MainActivity::class.java)
-        startActivity(intent)
-    }
-
 
     private fun onPopularMoviesFetched(movies: List<Movie>) {
         Log.d("MovieFragment", "Movies: $movies")
@@ -124,5 +148,29 @@ class MovieFragment : Fragment(), View.OnClickListener {
                 .transform(CenterCrop())
                 .into(imageViewMovie)
         }
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        activity?.supportFragmentManager?.beginTransaction()?.apply {
+            replace(R.id.fl_wrapper, fragment)
+            commit()
+        }
+    }
+
+    private fun toast(message: String) {
+        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun swipe(swipe: Int){
+        when(swipe){
+            superLike -> toast("Super like")
+            like -> toast("Like")
+            notToday -> toast("Not today")
+            never -> toast("Never")
+        }
+    }
+
+    private fun showNextMovie() {
+
     }
 }
