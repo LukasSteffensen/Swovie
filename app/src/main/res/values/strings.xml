@@ -38,6 +38,8 @@
     <string name="nomatches">No matches yet</string>
     <string name="groupnomembers">Give the group code to your friends so they can join the group.</string>
     <string name="viewmembers">View Members</string>
+    <string name="viewswipes">View swipes</string>
+    <string name="matchpercentage">% match</string>
     <string name="leavegroup">Leave Group</string>
     <string name="alertleavegroup">Are you sure you want to leave the group?</string>
 
