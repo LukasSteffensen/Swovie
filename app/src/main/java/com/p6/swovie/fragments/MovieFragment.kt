@@ -6,8 +6,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DefaultItemAnimator
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.google.firebase.auth.FirebaseAuth
@@ -15,11 +17,13 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.p6.swovie.*
+import com.p6.swovie.R
 import com.p6.swovie.dataClasses.Movie
+import com.yuyakaido.android.cardstackview.*
 import okhttp3.OkHttpClient
 
 
-class MovieFragment : Fragment(), View.OnClickListener {
+class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
 
     private val TAG = "MovieFragment"
 
@@ -34,8 +38,12 @@ class MovieFragment : Fragment(), View.OnClickListener {
     private val notToday = 2
     private val never = 3
 
+    private lateinit var manager: CardStackLayoutManager
+    private lateinit var adapter: CardStackAdapter
+
     private var auth: FirebaseAuth = Firebase.auth
     private val db = Firebase.firestore
+    private lateinit var cardStackView: CardStackView
 
     private lateinit var buttonNever: ImageButton
     private lateinit var buttonNotToday: ImageButton
@@ -48,14 +56,6 @@ class MovieFragment : Fragment(), View.OnClickListener {
     private val JSON_URL = "https://api.themoviedb.org/3/movie/22?api_key=9870f62e69820872d263749cf1055bc1"
     private val JSON_URL_POPULAR = "https://api.themoviedb.org/3/movie/popular?api_key=9870f62e69820872d263749cf1055bc1"
 
-
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-
-    }
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -75,9 +75,21 @@ class MovieFragment : Fragment(), View.OnClickListener {
                 }
         }
 
-        // Find all components in the Fragment
-        imageViewMovie = root.findViewById(R.id.imageView_movie)
-        textViewTitle = root.findViewById(R.id.textView_title)
+
+        cardStackView= root.findViewById(R.id.card_stack_view)
+        manager = CardStackLayoutManager(context, this)
+        manager.setStackFrom(StackFrom.None)
+        manager.setVisibleCount(2)
+        manager.setTranslationInterval(8.0f)
+        manager.setScaleInterval(0.95f)
+        manager.setSwipeThreshold(0.3f)
+        manager.setMaxDegree(20.0f)
+        manager.setDirections(Direction.FREEDOM)
+        manager.setCanScrollHorizontal(true)
+        manager.setSwipeableMethod(SwipeableMethod.Manual)
+        val interpol = LinearInterpolator()
+        manager.setOverlayInterpolator(interpol)
+
         buttonNever = root.findViewById(R.id.imageView_never)
         buttonNotToday = root.findViewById(R.id.imageView_not_today)
         buttonLike = root.findViewById(R.id.imageView_like)
@@ -103,9 +115,6 @@ class MovieFragment : Fragment(), View.OnClickListener {
                 onError = ::onError
         )
 
-        Glide.with(this) // Using Glide to set poster in the app
-                .load(JSON_URL_IMAGE)
-                .into(imageViewMovie)
         return root
 
     }
@@ -135,6 +144,10 @@ class MovieFragment : Fragment(), View.OnClickListener {
 
     private fun onPopularMoviesFetched(movies: List<Movie>) {
         Log.d("MovieFragment", "Movies: $movies")
+        adapter = CardStackAdapter(movies)
+        cardStackView.layoutManager = manager
+        cardStackView.adapter = adapter
+        cardStackView.itemAnimator = DefaultItemAnimator()
     }
 
     private fun onError() {
@@ -171,6 +184,38 @@ class MovieFragment : Fragment(), View.OnClickListener {
     }
 
     private fun showNextMovie() {
+
+    }
+
+    override fun onCardDragging(direction: Direction?, ratio: Float) {
+
+    }
+
+    override fun onCardSwiped(direction: Direction?) {
+        if(direction == Direction.Right){
+            toast("Swiped Right")
+        } else if (direction == Direction.Left){
+            toast("Swiped Left")
+        } else if (direction == Direction.Top){
+            toast("Swiped Up")
+        } else if (direction == Direction.Bottom){
+            toast("Swiped Down")
+        }
+    }
+
+    override fun onCardRewound() {
+
+    }
+
+    override fun onCardCanceled() {
+
+    }
+
+    override fun onCardAppeared(view: View?, position: Int) {
+
+    }
+
+    override fun onCardDisappeared(view: View?, position: Int) {
 
     }
 }
