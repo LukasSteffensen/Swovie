@@ -47,6 +47,4 @@ object MoviesRepository {
                     }
                 })
     }
-
-
 }

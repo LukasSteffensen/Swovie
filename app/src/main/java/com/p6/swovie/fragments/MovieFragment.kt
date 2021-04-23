@@ -13,6 +13,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.p6.swovie.*
 import com.p6.swovie.dataClasses.Movie
 import okhttp3.OkHttpClient
+import java.util.*
 
 
 class MovieFragment : Fragment(), View.OnClickListener {
@@ -20,6 +21,7 @@ class MovieFragment : Fragment(), View.OnClickListener {
     private lateinit var imageViewMovie: ImageView
     private lateinit var textViewTitle: TextView
     private val client = OkHttpClient()
+    private var movieList: List<Movie>? = null
     private lateinit var buttonNever: ImageButton
     private lateinit var buttonNotToday: ImageButton
     private lateinit var buttonLike: ImageButton
@@ -31,21 +33,14 @@ class MovieFragment : Fragment(), View.OnClickListener {
     private val JSON_URL = "https://api.themoviedb.org/3/movie/22?api_key=9870f62e69820872d263749cf1055bc1"
     private val JSON_URL_POPULAR = "https://api.themoviedb.org/3/movie/popular?api_key=9870f62e69820872d263749cf1055bc1"
 
-
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-
-    }
-
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_movie, container, false)
+
+
 
         // Find all components in the Fragment
         imageViewMovie = root.findViewById(R.id.imageView_movie)
@@ -111,6 +106,7 @@ class MovieFragment : Fragment(), View.OnClickListener {
 
     private fun onPopularMoviesFetched(movies: List<Movie>) {
         Log.d("MovieFragment", "Movies: $movies")
+        movieList = movies
     }
 
     private fun onError() {
