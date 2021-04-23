@@ -50,11 +50,11 @@ class SearchFragment : Fragment() {
         moviesRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             val totalItemCount =
-                popularMoviesLayoutMgr.itemCount //the total number of movies inside our popularMoviesAdapter. This will keep increasing the more we call popularMoviesAdapter.appendMovies().
+                gridLayoutManager.itemCount //the total number of movies inside our popularMoviesAdapter. This will keep increasing the more we call popularMoviesAdapter.appendMovies().
             val visibleItemCount =
-                popularMoviesLayoutMgr.childCount //the current number of child views attached to the RecyclerView that are currently being recycled over and over again. The value of this variable for common screen sizes will range roughly around 4-5 which are 3 visible views, +1 left view that’s not seen yet and +1 right view that’s not seen yet also. The value will be higher if you have a bigger screen.
+                gridLayoutManager.childCount //the current number of child views attached to the RecyclerView that are currently being recycled over and over again. The value of this variable for common screen sizes will range roughly around 4-5 which are 3 visible views, +1 left view that’s not seen yet and +1 right view that’s not seen yet also. The value will be higher if you have a bigger screen.
             val firstVisibleItem =
-                popularMoviesLayoutMgr.findFirstVisibleItemPosition() // is the position of the leftmost visible item in our list.
+                gridLayoutManager.findFirstVisibleItemPosition() // is the position of the leftmost visible item in our list.
 
             if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
                 moviesRecyclerView.removeOnScrollListener(this)
