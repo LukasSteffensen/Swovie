@@ -13,13 +13,17 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.p6.swovie.MatchAdapter
 import com.p6.swovie.R
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class SecondMatchFragment : Fragment(), View.OnClickListener {
@@ -33,6 +37,9 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
     private lateinit var textViewGroup: TextView
     private lateinit var uid: String
     private lateinit var groupCode: String
+    private lateinit var adapter: MatchAdapter
+    private lateinit var matchRecyclerView: RecyclerView
+    private lateinit var linearLayoutManager: LinearLayoutManager
     var auth: FirebaseAuth = Firebase.auth
     val db = Firebase.firestore
 
@@ -44,12 +51,25 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
         //Components from fragment_match2 layout
         buttonViewMembers = root.findViewById(R.id.button_view_members)
         buttonLeave = root.findViewById(R.id.button_leave_group)
+        textViewGroup = root.findViewById(R.id.textView_current_group_code)
+        matchRecyclerView = root.findViewById(R.id.recyclerView_matches)
 
         //Click listeners, makes onClick methods possible
         buttonViewMembers.setOnClickListener(this)
         buttonLeave.setOnClickListener(this)
 
-        textViewGroup = root.findViewById(R.id.textView_current_group_code)
+        val groupTest = ArrayList<String>()
+        groupTest.add("Avengers")
+        groupTest.add("Terminator")
+        groupTest.add("Silence of the lambs")
+        groupTest.add("Toy Story")
+        groupTest.add("Glib jocks quiz nymph to vex dwarf")
+
+        //Making the recyclerview adapter thing
+        linearLayoutManager = LinearLayoutManager(context)
+        matchRecyclerView.layoutManager = linearLayoutManager
+        adapter = MatchAdapter(groupTest)
+        matchRecyclerView.adapter = adapter
 
         //initialize uid
         uid = auth.currentUser.uid
