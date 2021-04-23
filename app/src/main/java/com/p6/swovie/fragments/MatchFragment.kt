@@ -30,7 +30,6 @@ class MatchFragment : Fragment(), View.OnClickListener {
     private lateinit var secondMatchFragment: Fragment
 
     private lateinit var buttonCreate: Button
-    private lateinit var buttonJoin: Button
     private lateinit var buttonViewMembers: Button
     private lateinit var buttonLeave: Button
     private lateinit var editTextCode1: EditText
@@ -53,8 +52,6 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
         //Components from fragment_match layout
         buttonCreate = root.findViewById(R.id.button_create_group)
-        //buttonJoin = root.findViewById(R.id.button_join_group)
-        //buttonJoin.isClickable = false
         editTextCode1 = root.findViewById(R.id.edit)
         editTextCode2 = root.findViewById(R.id.edit1)
         editTextCode3 = root.findViewById(R.id.edit2)
@@ -67,7 +64,6 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
         //Click listeners, makes onClick methods possible
         buttonCreate.setOnClickListener(this)
-        //buttonJoin.setOnClickListener(this)
 
         addListenerEdit(editTextCode1, editTextCode2, editTextCode1)
         addListenerEdit(editTextCode2, editTextCode3, editTextCode1)
@@ -87,7 +83,6 @@ class MatchFragment : Fragment(), View.OnClickListener {
                     .append(editTextCode4.text.toString())
                 Log.i(TAG, groupCode)
                 groupCode = sb.toString()
-                buttonJoin.isClickable = true
                 joinGroup(groupCode)
             } else if (editTextCode4.text.isEmpty()) {
                 openSoftKeyboard(editTextCode3)
@@ -123,7 +118,6 @@ class MatchFragment : Fragment(), View.OnClickListener {
                 createGroup()
                 replaceFragment(secondMatchFragment)
             }
-            //buttonJoin -> joinGroup(groupCode)
         }
     }
 
