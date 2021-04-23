@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.p6.swovie.*
@@ -45,6 +46,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     private val db = Firebase.firestore
     private lateinit var uid: String
     private lateinit var groupCode: String
+    private lateinit var movieId: String
     private lateinit var cardStackView: CardStackView
 
     private lateinit var buttonNever: ImageButton
@@ -233,22 +235,48 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     private fun saveSwipeToDatabase(swipe: Int) {
 
         // making hashmap of movie ID containing arrays of user IDs for each type of swipe
+        movieId = "movieId2" //Put actual movie id here soon
 
-        val swipedMovieId = hashMapOf<String, Any> (
+        val updates = hashMapOf<String, Any> (
             when(swipe) {
-                superLike -> uid to "Super like"
-                like -> uid to "Like"
-                notToday -> uid to "Not today"
-                never -> uid to "Never"
+                superLike -> "Super like" to FieldValue.arrayUnion(uid)
+                like -> "Like" to FieldValue.arrayUnion(uid)
+                notToday -> "Not today" to FieldValue.arrayUnion(uid)
+                never -> "Never" to FieldValue.arrayUnion(uid)
                 else -> "" to ""
             }
         )
 
+        //get movie document
         db.collection("rooms")
-            .document(groupCode).update(swipedMovieId)
-            .addOnSuccessListener {
-                Log.d(TAG, "DocumentSnapshot added with ID: $groupCode")
+            .document(groupCode)
+            .collection("swipes")
+            .document(movieId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    db.collection("rooms")
+                        .document(groupCode)
+                        .collection("swipes")
+                        .document(movieId)
+                        .update(updates)
+                        .addOnSuccessListener {
+                            Log.d(TAG, "DocumentSnapshot added with ID: $groupCode")
+                        }
+                } else {
+                    db.collection("rooms")
+                        .document(groupCode)
+                        .collection("swipes")
+                        .document(movieId)
+                        .set(updates)
+                        .addOnSuccessListener {
+                            Log.d(TAG, "DocumentSnapshot added with ID: $groupCode")
+                        }
+                }
+                Log.i(TAG, "group code: $groupCode")
             }
-
+            .addOnFailureListener { exception ->
+                Log.d(TAG, "get failed with ", exception)
+            }
     }
 }
