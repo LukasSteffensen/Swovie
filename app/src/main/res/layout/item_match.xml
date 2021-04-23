@@ -43,13 +43,13 @@
 
         <ImageView
             android:id="@+id/imageView_match_poster"
-            android:layout_width="93dp"
-            android:layout_height="131dp"
+            android:layout_width="92dp"
+            android:layout_height="136dp"
+            android:contentDescription="@string/movie"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/avengers_poster"
-            android:contentDescription="@string/movie"/>
+            app:srcCompat="@drawable/avengers_poster" />
 
         <TextView
             android:id="@+id/textView_match_percentage"

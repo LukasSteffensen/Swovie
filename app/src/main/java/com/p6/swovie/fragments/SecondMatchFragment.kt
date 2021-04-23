@@ -35,9 +35,12 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
     private lateinit var buttonViewMembers: Button
     private lateinit var buttonLeave: Button
     private lateinit var textViewGroup: TextView
+    private lateinit var textViewNoMatches: TextView
     private lateinit var uid: String
     private lateinit var movieId: String
     private lateinit var groupCode: String
+    private var arraylist = arrayListOf("Hulk", "Sherk")
+    private var arraylist2 = arrayListOf<String>()
     private lateinit var adapter: MatchAdapter
     private lateinit var matchRecyclerView: RecyclerView
     private lateinit var linearLayoutManager: LinearLayoutManager
@@ -53,11 +56,14 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
         buttonViewMembers = root.findViewById(R.id.button_view_members)
         buttonLeave = root.findViewById(R.id.button_leave_group)
         textViewGroup = root.findViewById(R.id.textView_current_group_code)
+        textViewNoMatches = root.findViewById(R.id.textView_no_matches)
         matchRecyclerView = root.findViewById(R.id.recyclerView_matches)
 
         //Click listeners, makes onClick methods possible
         buttonViewMembers.setOnClickListener(this)
         buttonLeave.setOnClickListener(this)
+
+        getGroupCode()
 
         val groupTest = ArrayList<String>()
         groupTest.add("Avengers")
@@ -66,60 +72,90 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
         groupTest.add("Toy Story")
         groupTest.add("Glib jocks quiz nymph to vex dwarf")
 
-        //Making the recyclerview adapter thing
-        linearLayoutManager = LinearLayoutManager(context)
-        matchRecyclerView.layoutManager = linearLayoutManager
-        adapter = MatchAdapter(groupTest)
-        matchRecyclerView.adapter = adapter
 
-        //initialize uid
-        uid = auth.currentUser.uid
-
-        //get group code
-        db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
-            .addOnSuccessListener { document ->
-                groupCode = document.documents[0].id
-                Log.i(TAG, "group code: $groupCode")
-                textViewGroup.text = "Group code: $groupCode"
-            }
-            .addOnFailureListener { exception ->
-                Log.d(TAG, "get failed with ", exception)
-            }
         return root
     }
 
     override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
         when (view) {
             buttonViewMembers -> Toast.makeText(activity, "ViewMembers", Toast.LENGTH_SHORT).show()
-            buttonLeave -> {
-                matchFragment = MatchFragment()
-                val docRef = db.collection("rooms").document(groupCode)
-                docRef.get()
-                    .addOnSuccessListener { document ->
-                        var array: ArrayList<String> = document.get("users") as ArrayList<String>
-                        if (array.size == 1) {
-                            //Delete group if you are the last group member
-                            docRef.delete()
-                                .addOnSuccessListener {
-                                    replaceFragment(matchFragment)
-                                    Log.d(TAG, "DocumentSnapshot successfully deleted!") }
-                                .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
-                        } else {
-                            // remove user from group
-                            val updates = hashMapOf<String, Any>(
-                                "users" to FieldValue.arrayRemove(uid)
-                            )
-                            docRef.update(updates).addOnCompleteListener {
-                            }
-                                .addOnFailureListener { exception ->
-                                    Log.d(TAG, "get failed with ", exception)
-                                }
-                            replaceFragment(matchFragment)
-                        }
-                    }
-                //TODO Delete user's swipes from the group in firestore
-            }
+            buttonLeave -> leaveGroup()
         }
+    }
+
+    private fun getSwipes() {
+
+        movieId = "movieId2" //Put actual movie id here soon
+
+        val colRef = db.collection("rooms")
+            .document(groupCode)
+            .collection("swipes")
+
+        //get movie document
+        colRef
+            .get()
+            .addOnSuccessListener { result ->
+                if (result.isEmpty) {
+                    textViewNoMatches.text = getString(R.string.nomatches)
+                } else {
+                    //Making the recyclerview adapter thing
+                    linearLayoutManager = LinearLayoutManager(context)
+                    matchRecyclerView.layoutManager = linearLayoutManager
+                    adapter = MatchAdapter(arraylist)
+                    matchRecyclerView.adapter = adapter
+
+                    for (document in result) {
+                        Log.i(TAG, document.toString())
+                    }
+                }
+            }.addOnFailureListener { exception ->
+                Log.d(TAG, "get failed with ", exception)
+            }
+    }
+
+    private fun leaveGroup() {
+
+        matchFragment = MatchFragment()
+        val docRef = db.collection("rooms").document(groupCode)
+        docRef.get()
+            .addOnSuccessListener { document ->
+                var array: ArrayList<String> = document.get("users") as ArrayList<String>
+                if (array.size == 1) {
+                    //Delete group if you are the last group member
+                    docRef.delete()
+                        .addOnSuccessListener {
+                            replaceFragment(matchFragment)
+                            Log.d(TAG, "DocumentSnapshot successfully deleted!")
+                        }
+                        .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
+                } else {
+                    // remove user from group
+                    val updates = hashMapOf<String, Any>(
+                        "users" to FieldValue.arrayRemove(uid)
+                    )
+                    docRef.update(updates).addOnCompleteListener {
+                    }
+                        .addOnFailureListener { exception ->
+                            Log.d(TAG, "get failed with ", exception)
+                        }
+                    replaceFragment(matchFragment)
+                }
+            }
+        //TODO Delete user's swipes from the group in firestore
+    }
+
+    private fun getGroupCode() {
+        uid = auth.currentUser.uid
+        db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
+            .addOnSuccessListener { document ->
+                groupCode = document.documents[0].id
+                getSwipes()
+                Log.i(TAG, "group code: $groupCode")
+                textViewGroup.text = "Group code: $groupCode"
+            }
+            .addOnFailureListener { exception ->
+                Log.d(TAG, "get failed with ", exception)
+            }
     }
 
     private fun inputAgain(editText: EditText, toast: String) {

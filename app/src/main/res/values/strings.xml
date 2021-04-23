@@ -37,6 +37,8 @@
     <string name="groupcode">Group code: </string>
     <string name="nomatches">No matches yet</string>
     <string name="groupnomembers">Give the group code to your friends so they can join the group.</string>
+    <string name="grouphelp">Join a group by entering the 4-character group code</string>
+    <string name="grouphelp2">Or create a new group.</string>
     <string name="viewmembers">View Members</string>
     <string name="viewswipes">View swipes</string>
     <string name="matchpercentage">% match</string>

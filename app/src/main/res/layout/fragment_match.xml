@@ -6,6 +6,89 @@
     android:layout_height="match_parent"
     tools:context=".fragments.MatchFragment">
 
+    <Button
+        android:id="@+id/button_create_group"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/creategroup"
+        android:textColor="@color/secondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.507"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_group_help_text2" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="96dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginEnd="32dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_match">
+
+        <EditText
+            android:id="@+id/edit"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/edittextbackground"
+            android:gravity="center"
+            android:importantForAutofill="no"
+            android:inputType="textCapCharacters"
+            android:maxLength="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display2" />
+
+        <EditText
+            android:id="@+id/edit1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/edittextbackground"
+            android:gravity="center"
+            android:importantForAutofill="no"
+            android:inputType="textCapCharacters"
+            android:maxLength="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display2" />
+
+        <EditText
+            android:id="@+id/edit2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/edittextbackground"
+            android:gravity="center"
+            android:importantForAutofill="no"
+            android:inputType="textCapCharacters"
+            android:maxLength="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display2" />
+
+        <EditText
+            android:id="@+id/edit3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/edittextbackground"
+            android:gravity="center"
+            android:importantForAutofill="no"
+            android:inputType="textCapCharacters"
+            android:maxLength="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display2" />
+
+    </LinearLayout>
+
     <TextView
         android:id="@+id/textView_match"
         android:layout_width="wrap_content"
@@ -20,164 +103,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/button_create_group"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+    <TextView
+        android:id="@+id/textView_group_help_text"
+        style="@style/TextAppearance.AppCompat.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="@string/creategroup"
-        android:textColor="@color/secondary"
+        android:layout_marginTop="16dp"
+        android:text="@string/grouphelp"
+        android:textColor="@color/primary"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_match" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
+    <TextView
+        android:id="@+id/textView_group_help_text2"
+        style="@style/TextAppearance.AppCompat.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline8"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.1" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.9" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.3" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.7" />
-
-    <EditText
-        android:id="@+id/edit1"
-        android:layout_width="0dp"
-        android:layout_height="96dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/edittextbackground"
-        android:gravity="center"
-        android:importantForAutofill="no"
-        android:inputType="textCapCharacters"
-        android:maxLength="1"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
-        app:layout_constraintBottom_toTopOf="@+id/guideline4"
-        app:layout_constraintEnd_toStartOf="@+id/guideline3"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline5"
-        app:layout_constraintTop_toTopOf="@+id/guideline9"
-        app:layout_constraintVertical_bias="0.333" />
-
-    <Button
-        android:id="@+id/button_join_group"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
-        android:text="@string/joingroup"
-        android:textColor="@color/secondary"
+        android:layout_marginTop="128dp"
+        android:text="@string/grouphelp2"
+        android:textColor="@color/primary"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline4" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.45" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline9"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="252dp" />
-
-    <EditText
-        android:id="@+id/edit"
-        android:layout_width="0dp"
-        android:layout_height="96dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/edittextbackground"
-        android:gravity="center"
-        android:importantForAutofill="no"
-        android:inputType="textCapCharacters"
-        android:maxLength="1"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
-        app:layout_constraintBottom_toTopOf="@+id/guideline4"
-        app:layout_constraintEnd_toStartOf="@+id/guideline5"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline8"
-        app:layout_constraintTop_toTopOf="@+id/guideline9"
-        app:layout_constraintVertical_bias="0.333" />
-
-    <EditText
-        android:id="@+id/edit3"
-        android:layout_width="0dp"
-        android:layout_height="96dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/edittextbackground"
-        android:gravity="center"
-        android:importantForAutofill="no"
-        android:inputType="textCapCharacters"
-        android:maxLength="1"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
-        app:layout_constraintBottom_toTopOf="@+id/guideline4"
-        app:layout_constraintEnd_toStartOf="@+id/guideline7"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline6"
-        app:layout_constraintTop_toTopOf="@+id/guideline9"
-        app:layout_constraintVertical_bias="0.333" />
-
-    <EditText
-        android:id="@+id/edit2"
-        android:layout_width="0dp"
-        android:layout_height="96dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/edittextbackground"
-        android:gravity="center"
-        android:importantForAutofill="no"
-        android:inputType="textCapCharacters"
-        android:maxLength="1"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
-        app:layout_constraintBottom_toTopOf="@+id/guideline4"
-        app:layout_constraintEnd_toStartOf="@+id/guideline6"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline3"
-        app:layout_constraintTop_toTopOf="@+id/guideline9"
-        app:layout_constraintVertical_bias="0.333" />
-
+        app:layout_constraintTop_toBottomOf="@+id/textView_group_help_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

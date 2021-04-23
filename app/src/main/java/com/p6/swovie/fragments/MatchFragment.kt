@@ -53,8 +53,8 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
         //Components from fragment_match layout
         buttonCreate = root.findViewById(R.id.button_create_group)
-        buttonJoin = root.findViewById(R.id.button_join_group)
-        buttonJoin.isClickable = false
+        //buttonJoin = root.findViewById(R.id.button_join_group)
+        //buttonJoin.isClickable = false
         editTextCode1 = root.findViewById(R.id.edit)
         editTextCode2 = root.findViewById(R.id.edit1)
         editTextCode3 = root.findViewById(R.id.edit2)
@@ -67,7 +67,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
         //Click listeners, makes onClick methods possible
         buttonCreate.setOnClickListener(this)
-        buttonJoin.setOnClickListener(this)
+        //buttonJoin.setOnClickListener(this)
 
         addListenerEdit(editTextCode1, editTextCode2, editTextCode1)
         addListenerEdit(editTextCode2, editTextCode3, editTextCode1)
@@ -123,7 +123,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
                 createGroup()
                 replaceFragment(secondMatchFragment)
             }
-            buttonJoin -> joinGroup(groupCode)
+            //buttonJoin -> joinGroup(groupCode)
         }
     }
 
