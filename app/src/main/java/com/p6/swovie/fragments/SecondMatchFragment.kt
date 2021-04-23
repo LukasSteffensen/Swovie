@@ -36,6 +36,7 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
     private lateinit var buttonLeave: Button
     private lateinit var textViewGroup: TextView
     private lateinit var uid: String
+    private lateinit var movieId: String
     private lateinit var groupCode: String
     private lateinit var adapter: MatchAdapter
     private lateinit var matchRecyclerView: RecyclerView
@@ -84,8 +85,6 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
             .addOnFailureListener { exception ->
                 Log.d(TAG, "get failed with ", exception)
             }
-
-
         return root
     }
 

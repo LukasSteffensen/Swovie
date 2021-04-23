@@ -46,9 +46,8 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     private val db = Firebase.firestore
     private lateinit var uid: String
     private lateinit var groupCode: String
-    private lateinit var movieId: String
     private lateinit var cardStackView: CardStackView
-    private lateinit var movieList: List<Movie>
+    private lateinit var movieList: MutableList<Movie>
 
     private lateinit var buttonNever: ImageButton
     private lateinit var buttonNotToday: ImageButton
@@ -153,7 +152,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
 
     private fun onPopularMoviesFetched(movies: List<Movie>) {
         Log.d("MovieFragment", "Movies: $movies")
-        movieList = movies
+        movieList = movies as MutableList<Movie>
         if (popularMoviesPage == 1) {
             adapter = CardStackAdapter(movies as MutableList<Movie>)
             cardStackView.layoutManager = manager
@@ -161,6 +160,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
             cardStackView.itemAnimator = DefaultItemAnimator()
             Log.i(TAG, "should only be called once")
         } else {
+            movieList.addAll(movies)
             adapter.updateList(movies as MutableList<Movie>)
             var previousPosition = manager.topPosition
             adapter.notifyDataSetChanged()
@@ -261,8 +261,9 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
 
     private fun saveSwipeToDatabase(swipe: Int) {
 
-        // making hashmap of movie ID containing arrays of user IDs for each type of swipe
-        movieId = "movieId2" //Put actual movie id here soon
+        val movieId = movieList[manager.topPosition-1].id
+        Log.i(TAG, "movie id: ${movieList[manager.topPosition-1].id}" +
+                " movie title: ${movieList[manager.topPosition-1].title}")
 
         val updates = hashMapOf<String, Any>(
             when (swipe) {
@@ -274,27 +275,26 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
             }
         )
 
-        //get movie document
-        db.collection("rooms")
+        val docRef = db.collection("rooms")
             .document(groupCode)
             .collection("swipes")
-            .document(movieId)
+            .document(movieId.toString())
+
+        //get movie document
+        docRef
             .get()
             .addOnSuccessListener { document ->
+                // if document exists it will update the correct swipe array with user uid
                 if (document.exists()) {
-                    db.collection("rooms")
-                        .document(groupCode)
-                        .collection("swipes")
-                        .document(movieId)
+                    docRef
                         .update(updates)
                         .addOnSuccessListener {
                             Log.d(TAG, "DocumentSnapshot added with ID: $groupCode")
                         }
                 } else {
-                    db.collection("rooms")
-                        .document(groupCode)
-                        .collection("swipes")
-                        .document(movieId)
+                    // if document doesn't exist it will set document and the given array
+                    // it will also create the subcollection if it is not there
+                    docRef
                         .set(updates)
                         .addOnSuccessListener {
                             Log.d(TAG, "DocumentSnapshot added with ID: $groupCode")
