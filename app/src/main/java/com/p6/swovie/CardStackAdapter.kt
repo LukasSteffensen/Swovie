@@ -9,15 +9,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.p6.swovie.dataClasses.Movie
 
-class CardStackAdapter (private var movies: List<Movie>): RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
-
-
-
-
+class CardStackAdapter (private var movies: MutableList<Movie>): RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        var inflater: LayoutInflater = LayoutInflater.from(parent.context);
-        var view = inflater.inflate(R.layout.movie_card, parent, false)
+        val inflater: LayoutInflater = LayoutInflater.from(parent.context);
+        val view = inflater.inflate(R.layout.movie_card, parent, false)
         return ViewHolder(view)
     }
 
@@ -29,11 +25,22 @@ class CardStackAdapter (private var movies: List<Movie>): RecyclerView.Adapter<C
         return movies.size
     }
 
+    fun getList(): MutableList<Movie>{
+        return movies
+    }
+
+    fun updateList(list: MutableList<Movie>){
+        movies.addAll(list)
+    }
+
+    fun setList(list: MutableList<Movie>){
+        this.movies = list
+    }
+
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
         lateinit var image: ImageView
         lateinit var title: String
-
-
 
         fun setData(movie: Movie) {
             image = itemView.findViewById(R.id.item_image)
@@ -44,4 +51,5 @@ class CardStackAdapter (private var movies: List<Movie>): RecyclerView.Adapter<C
                 .into(image)
         }
     }
+
 }

@@ -48,6 +48,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     private lateinit var groupCode: String
     private lateinit var movieId: String
     private lateinit var cardStackView: CardStackView
+    private lateinit var movieList: List<Movie>
 
     private lateinit var buttonNever: ImageButton
     private lateinit var buttonNotToday: ImageButton
@@ -55,21 +56,18 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     private lateinit var buttonSuperLike: ImageButton
     private lateinit var buttonFilter: Button
     private lateinit var buttonMatches: Button
-    //val genres = ArrayList<String>()
-    private val JSON_URL_IMAGE = "https://image.tmdb.org/t/p/original/z8onk7LV9Mmw6zKz4hT6pzzvmvl.jpg"
-    private val JSON_URL = "https://api.themoviedb.org/3/movie/22?api_key=9870f62e69820872d263749cf1055bc1"
-    private val JSON_URL_POPULAR = "https://api.themoviedb.org/3/movie/popular?api_key=9870f62e69820872d263749cf1055bc1"
+    private var popularMoviesPage: Int = 1
 
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_movie, container, false)
 
         //set isInGroup boolean
-        if(auth.currentUser != null) {
+        if (auth.currentUser != null) {
             db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
                 .addOnSuccessListener { document ->
                     isInGroup = !document.isEmpty
@@ -86,17 +84,19 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         //get group code
         db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
             .addOnSuccessListener { document ->
-                groupCode = document.documents[0].id
-                Log.i(TAG, "group code: $groupCode")
+                if (!document.isEmpty) {
+                    groupCode = document.documents[0].id
+                    Log.i(TAG, "group code: $groupCode")
+                }
             }
             .addOnFailureListener { exception ->
                 Log.d(TAG, "get failed with ", exception)
             }
 
-        cardStackView= root.findViewById(R.id.card_stack_view)
+        cardStackView = root.findViewById(R.id.card_stack_view)
         manager = CardStackLayoutManager(context, this)
         manager.setStackFrom(StackFrom.None)
-        manager.setVisibleCount(2)
+        manager.setVisibleCount(5)
         manager.setTranslationInterval(8.0f)
         manager.setScaleInterval(0.95f)
         manager.setSwipeThreshold(0.3f)
@@ -104,8 +104,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         manager.setDirections(Direction.FREEDOM)
         manager.setCanScrollHorizontal(true)
         manager.setSwipeableMethod(SwipeableMethod.Manual)
-        val interpol = LinearInterpolator()
-        manager.setOverlayInterpolator(interpol)
+        manager.setOverlayInterpolator(LinearInterpolator())
 
         buttonNever = root.findViewById(R.id.imageView_never)
         buttonNotToday = root.findViewById(R.id.imageView_not_today)
@@ -127,13 +126,9 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         matchFragment = MatchFragment()
         secondMatchFragment = SecondMatchFragment()
 
-        MoviesRepository.getPopularMovies(
-                onSuccess = ::onPopularMoviesFetched,
-                onError = ::onError
-        )
+        loadMoreMovies()
 
         return root
-
     }
 
     override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
@@ -148,23 +143,42 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
             } else {
                 replaceFragment(matchFragment)
             }
-
-
-
         }
     }
 
-    private fun changeToFilters(){
-        val intent = Intent (activity, FilterDialogFragment::class.java)
+    private fun changeToFilters() {
+        val intent = Intent(activity, FilterDialogFragment::class.java)
         startActivity(intent)
     }
 
     private fun onPopularMoviesFetched(movies: List<Movie>) {
         Log.d("MovieFragment", "Movies: $movies")
-        adapter = CardStackAdapter(movies)
-        cardStackView.layoutManager = manager
-        cardStackView.adapter = adapter
-        cardStackView.itemAnimator = DefaultItemAnimator()
+        movieList = movies
+        if (popularMoviesPage == 1) {
+            adapter = CardStackAdapter(movies as MutableList<Movie>)
+            cardStackView.layoutManager = manager
+            cardStackView.adapter = adapter
+            cardStackView.itemAnimator = DefaultItemAnimator()
+            Log.i(TAG, "should only be called once")
+        } else {
+            adapter.updateList(movies as MutableList<Movie>)
+            var previousPosition = manager.topPosition
+            adapter.notifyDataSetChanged()
+            manager.topPosition = previousPosition
+            Log.i(
+                TAG,
+                "\nMovies in adapter: ${adapter.itemCount}\n Movies left in manager: ${manager.topPosition}"
+            )
+        }
+        popularMoviesPage++
+    }
+
+    private fun loadMoreMovies() {
+        MoviesRepository.getPopularMovies(
+            popularMoviesPage,
+            onSuccess = ::onPopularMoviesFetched,
+            onError = ::onError
+        )
     }
 
     private fun onError() {
@@ -196,14 +210,27 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     }
 
     override fun onCardSwiped(direction: Direction?) {
-        if(direction == Direction.Right){
-            swipe(like)
-        } else if (direction == Direction.Left){
-            swipe(notToday)
-        } else if (direction == Direction.Top){
-            swipe(superLike)
-        } else if (direction == Direction.Bottom){
-            swipe(never)
+        when (direction) {
+            Direction.Right -> {
+                swipe(like)
+            }
+            Direction.Left -> {
+                swipe(notToday)
+            }
+            Direction.Top -> {
+                swipe(superLike)
+            }
+            Direction.Bottom -> {
+                swipe(never)
+            }
+        }
+        Log.i(
+            TAG,
+            "\nMovies in adapter: ${adapter.itemCount}\n Movies left in manager: ${manager.topPosition}"
+        )
+        if (manager.topPosition == adapter.itemCount - 5) {
+            loadMoreMovies()
+            Log.i(TAG, "Loading more movies")
         }
     }
 
@@ -223,8 +250,8 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
 
     }
 
-    private fun swipe(swipe: Int){
-        when(swipe){
+    private fun swipe(swipe: Int) {
+        when (swipe) {
             superLike -> saveSwipeToDatabase(swipe)
             like -> saveSwipeToDatabase(swipe)
             notToday -> saveSwipeToDatabase(swipe)
@@ -237,8 +264,8 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         // making hashmap of movie ID containing arrays of user IDs for each type of swipe
         movieId = "movieId2" //Put actual movie id here soon
 
-        val updates = hashMapOf<String, Any> (
-            when(swipe) {
+        val updates = hashMapOf<String, Any>(
+            when (swipe) {
                 superLike -> "Super like" to FieldValue.arrayUnion(uid)
                 like -> "Like" to FieldValue.arrayUnion(uid)
                 notToday -> "Not today" to FieldValue.arrayUnion(uid)
