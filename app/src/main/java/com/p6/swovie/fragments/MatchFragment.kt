@@ -96,6 +96,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
             }
         }
         return root
+
     }
 
     private fun addListenerEdit(editText: EditText, editText2: EditText, editTextPrev: EditText) {
