@@ -12,7 +12,6 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -22,7 +21,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.p6.swovie.MatchAdapter
 import com.p6.swovie.R
-import java.util.*
+import com.p6.swovie.dataClasses.Match
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -37,15 +36,17 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
     private lateinit var buttonLeave: Button
     private lateinit var textViewGroup: TextView
     private lateinit var textViewNoMatches: TextView
+
     private lateinit var uid: String
     private lateinit var movieId: String
     private lateinit var groupCode: String
     private var groupSize: Int = 0
-    private var arraylist = arrayListOf("Hulk", "Sherk")
-    private var arraylist2 = arrayListOf<String>()
+
+    private var matchArrayList: ArrayList<Match> = arrayListOf()
     private lateinit var adapter: MatchAdapter
     private lateinit var matchRecyclerView: RecyclerView
     private lateinit var linearLayoutManager: LinearLayoutManager
+
     var auth: FirebaseAuth = Firebase.auth
     val db = Firebase.firestore
 
@@ -91,15 +92,7 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
                 if (result.isEmpty) {
                     textViewNoMatches.text = getString(R.string.nomatches)
                 } else {
-                    //Making the recyclerview adapter thing
-                    linearLayoutManager = LinearLayoutManager(context)
-                    matchRecyclerView.layoutManager = linearLayoutManager
-                    adapter = MatchAdapter(arraylist)
-                    matchRecyclerView.adapter = adapter
-
-                    // group size should be real one instead of this here
-
-                    var matchPercentages: HashMap<Int, Int> = HashMap()
+                    var matchPercentages: HashMap<Int, Double> = HashMap()
                     var superLikes: ArrayList<String>
                     var likes: ArrayList<String>
                     var notTodays: ArrayList<String>
@@ -128,20 +121,30 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
                             arrayListOf()
                         }
 
-                        var superLikesInt = superLikes.size
-                        var likesInt = likes.size
+                        var superLikesInt = superLikes.size.toDouble()
+                        var likesInt = likes.size.toDouble()
                         var notTodaysInt = notTodays.size
-                        var neversInt = nevers.size
+                        var neversInt = nevers.size.toDouble()
 
                         var matchPercentage = (superLikesInt+superLikesInt/groupSize+likesInt-neversInt)*100/groupSize
 
+
+
                         matchPercentages[movieId] = matchPercentage
+
+                        Log.i(TAG, "MovieID: $movieId")
                         Log.i(TAG, "Super: $superLikesInt")
                         Log.i(TAG, "Like: $likesInt")
                         Log.i(TAG, "Not: $notTodaysInt")
                         Log.i(TAG, "Never: $neversInt")
                         Log.i(TAG, "match percentage: $matchPercentage")
                     }
+
+                    //Making the recyclerview adapter thing
+                    linearLayoutManager = LinearLayoutManager(context)
+                    matchRecyclerView.layoutManager = linearLayoutManager
+                    adapter = MatchAdapter(matchArrayList)
+                    matchRecyclerView.adapter = adapter
                 }
             }.addOnFailureListener { exception ->
                 Log.d(TAG, "get failed with ", exception)
