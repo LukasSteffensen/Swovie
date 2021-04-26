@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.*
 import androidx.fragment.app.Fragment
@@ -21,6 +22,7 @@ import com.p6.swovie.*
 import com.p6.swovie.R
 import com.p6.swovie.dataClasses.Movie
 import com.yuyakaido.android.cardstackview.*
+import com.yuyakaido.android.cardstackview.internal.CardStackSmoothScroller
 import okhttp3.OkHttpClient
 
 
@@ -56,6 +58,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     private lateinit var buttonFilter: Button
     private lateinit var buttonMatches: Button
     private var popularMoviesPage: Int = 1
+    private var doOnce = 1
 
 
     override fun onCreateView(
@@ -102,7 +105,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         manager.setMaxDegree(20.0f)
         manager.setDirections(Direction.FREEDOM)
         manager.setCanScrollHorizontal(true)
-        manager.setSwipeableMethod(SwipeableMethod.Manual)
+        manager.setSwipeableMethod(SwipeableMethod.AutomaticAndManual)
         manager.setOverlayInterpolator(LinearInterpolator())
 
         buttonNever = root.findViewById(R.id.imageView_never)
@@ -132,10 +135,42 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
 
     override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
         when (view) {
-            buttonSuperLike -> swipe(superLike)
-            buttonLike -> swipe(like)
-            buttonNotToday -> swipe(notToday)
-            buttonNever -> swipe(never)
+            buttonSuperLike -> {
+                val setting = SwipeAnimationSetting.Builder()
+                    .setDirection(Direction.Top)
+                    .setDuration(Duration.Normal.duration)
+                    .setInterpolator(AccelerateInterpolator())
+                    .build()
+                manager.setSwipeAnimationSetting(setting)
+                cardStackView.swipe()
+            }
+            buttonLike -> {
+                val setting = SwipeAnimationSetting.Builder()
+                    .setDirection(Direction.Right)
+                    .setDuration(Duration.Normal.duration)
+                    .setInterpolator(AccelerateInterpolator())
+                    .build()
+                manager.setSwipeAnimationSetting(setting)
+                cardStackView.swipe()
+            }
+            buttonNotToday -> {
+                val setting = SwipeAnimationSetting.Builder()
+                    .setDirection(Direction.Left)
+                    .setDuration(Duration.Normal.duration)
+                    .setInterpolator(AccelerateInterpolator())
+                    .build()
+                manager.setSwipeAnimationSetting(setting)
+                cardStackView.swipe()
+            }
+            buttonNever -> {
+                val setting = SwipeAnimationSetting.Builder()
+                    .setDirection(Direction.Bottom)
+                    .setDuration(Duration.Normal.duration)
+                    .setInterpolator(AccelerateInterpolator())
+                    .build()
+                manager.setSwipeAnimationSetting(setting)
+                cardStackView.swipe()
+            }
             buttonFilter -> changeToFilters()
             buttonMatches -> if (isInGroup) {
                 replaceFragment(secondMatchFragment)
@@ -153,12 +188,13 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     private fun onPopularMoviesFetched(movies: List<Movie>) {
         Log.d("MovieFragment", "Movies: $movies")
         movieList = movies as MutableList<Movie>
-        if (popularMoviesPage == 1) {
+        if (doOnce == 1) {
             adapter = CardStackAdapter(movies as MutableList<Movie>)
             cardStackView.layoutManager = manager
             cardStackView.adapter = adapter
             cardStackView.itemAnimator = DefaultItemAnimator()
             Log.i(TAG, "should only be called once")
+            doOnce = 14
         } else {
             movieList.addAll(movies)
             adapter.updateList(movies as MutableList<Movie>)
@@ -212,16 +248,16 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     override fun onCardSwiped(direction: Direction?) {
         when (direction) {
             Direction.Right -> {
-                swipe(like)
+                saveSwipeToDatabase(like, true)
             }
             Direction.Left -> {
-                swipe(notToday)
+                saveSwipeToDatabase(notToday, true)
             }
             Direction.Top -> {
-                swipe(superLike)
+                saveSwipeToDatabase(superLike, true)
             }
             Direction.Bottom -> {
-                swipe(never)
+                saveSwipeToDatabase(never, true)
             }
         }
         Log.i(
@@ -250,20 +286,23 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
 
     }
 
-    private fun swipe(swipe: Int) {
-        when (swipe) {
-            superLike -> saveSwipeToDatabase(swipe)
-            like -> saveSwipeToDatabase(swipe)
-            notToday -> saveSwipeToDatabase(swipe)
-            never -> saveSwipeToDatabase(swipe)
+    private fun saveSwipeToDatabase(swipe: Int, isSwipePhysical: Boolean) {
+
+        var movieId: Long = 0
+
+        if (isSwipePhysical){
+            movieId = movieList[manager.topPosition - 1].id
+            Log.i(
+                TAG, "movie id: ${movieList[manager.topPosition - 1].id}" +
+                        " movie title: ${movieList[manager.topPosition - 1].title}"
+            )
+        } else {
+            movieId = movieList[manager.topPosition].id
+            Log.i(
+                TAG, "movie id: ${movieList[manager.topPosition].id}" +
+                        " movie title: ${movieList[manager.topPosition].title}"
+            )
         }
-    }
-
-    private fun saveSwipeToDatabase(swipe: Int) {
-
-        val movieId = movieList[manager.topPosition-1].id
-        Log.i(TAG, "movie id: ${movieList[manager.topPosition-1].id}" +
-                " movie title: ${movieList[manager.topPosition-1].title}")
 
         val updates = hashMapOf<String, Any>(
             when (swipe) {

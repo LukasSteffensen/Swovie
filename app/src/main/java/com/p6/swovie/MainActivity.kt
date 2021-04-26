@@ -74,6 +74,4 @@ class MainActivity : AppCompatActivity() {
             commit()
         }
     }
-
-
 }
