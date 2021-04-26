@@ -24,6 +24,7 @@ import com.p6.swovie.MatchAdapter
 import com.p6.swovie.R
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 class SecondMatchFragment : Fragment(), View.OnClickListener {
@@ -39,6 +40,7 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
     private lateinit var uid: String
     private lateinit var movieId: String
     private lateinit var groupCode: String
+    private var groupSize: Int = 0
     private var arraylist = arrayListOf("Hulk", "Sherk")
     private var arraylist2 = arrayListOf<String>()
     private lateinit var adapter: MatchAdapter
@@ -76,22 +78,13 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
         return root
     }
 
-    override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
-        when (view) {
-            buttonViewMembers -> Toast.makeText(activity, "ViewMembers", Toast.LENGTH_SHORT).show()
-            buttonLeave -> leaveGroup()
-        }
-    }
-
     private fun getSwipes() {
-
-        movieId = "movieId2" //Put actual movie id here soon
 
         val colRef = db.collection("rooms")
             .document(groupCode)
             .collection("swipes")
 
-        //get movie document
+        //get swipes collection
         colRef
             .get()
             .addOnSuccessListener { result ->
@@ -104,8 +97,50 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
                     adapter = MatchAdapter(arraylist)
                     matchRecyclerView.adapter = adapter
 
+                    // group size should be real one instead of this here
+
+                    var matchPercentages: HashMap<Int, Int> = HashMap()
+                    var superLikes: ArrayList<String>
+                    var likes: ArrayList<String>
+                    var notTodays: ArrayList<String>
+                    var nevers: ArrayList<String>
                     for (document in result) {
-                        Log.i(TAG, document.toString())
+                        var movieId = document.id.toInt()
+
+                        superLikes = if (document.get("Super like") != null) {
+                            document.get("Super like") as ArrayList<String>
+                        } else {
+                            arrayListOf()
+                        }
+                        likes = if (document.get("Like") != null) {
+                            document.get("Like") as ArrayList<String>
+                        } else {
+                            arrayListOf()
+                        }
+                        notTodays = if (document.get("Not today") != null) {
+                            document.get("Not today") as ArrayList<String>
+                        } else {
+                            arrayListOf()
+                        }
+                        nevers = if (document.get("Never") != null) {
+                            document.get("Never") as ArrayList<String>
+                        } else {
+                            arrayListOf()
+                        }
+
+                        var superLikesInt = superLikes.size
+                        var likesInt = likes.size
+                        var notTodaysInt = notTodays.size
+                        var neversInt = nevers.size
+
+                        var matchPercentage = (superLikesInt+superLikesInt/groupSize+likesInt-neversInt)*100/groupSize
+
+                        matchPercentages[movieId] = matchPercentage
+                        Log.i(TAG, "Super: $superLikesInt")
+                        Log.i(TAG, "Like: $likesInt")
+                        Log.i(TAG, "Not: $notTodaysInt")
+                        Log.i(TAG, "Never: $neversInt")
+                        Log.i(TAG, "match percentage: $matchPercentage")
                     }
                 }
             }.addOnFailureListener { exception ->
@@ -146,9 +181,12 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
 
     private fun getGroupCode() {
         uid = auth.currentUser.uid
-        db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
+        db.collection("rooms").whereArrayContains("users", uid).get()
             .addOnSuccessListener { document ->
                 groupCode = document.documents[0].id
+                var groupArrayList: ArrayList<String> = arrayListOf<String>()
+                groupArrayList = document.documents[0].get("users") as ArrayList<String>
+                groupSize = groupArrayList.size
                 getSwipes()
                 Log.i(TAG, "group code: $groupCode")
                 textViewGroup.text = "Group code: $groupCode"
@@ -174,6 +212,13 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
         activity?.supportFragmentManager?.beginTransaction()?.apply {
             replace(R.id.fl_wrapper, fragment)
             commit()
+        }
+    }
+
+    override fun onClick(v: View?) {
+        when (view) {
+            buttonViewMembers -> Toast.makeText(activity, "ViewMembers", Toast.LENGTH_SHORT).show()
+            buttonLeave -> leaveGroup()
         }
     }
 }
