@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         if (item.itemId == R.id.ic_movie){
-            replaceFragment(movieFragment)
+            replaceFragment(MovieFragment())
         } else if (item.itemId == R.id.ic_match){
             if(isInGroup){
                 replaceFragment(secondMatchFragment)
