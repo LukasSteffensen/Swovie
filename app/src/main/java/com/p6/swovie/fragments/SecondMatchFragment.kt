@@ -20,6 +20,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.p6.swovie.MatchAdapter
+import com.p6.swovie.MoviesRepository
 import com.p6.swovie.R
 import com.p6.swovie.dataClasses.Match
 import kotlin.collections.ArrayList
@@ -68,14 +69,6 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
 
         getGroupCode()
 
-        val groupTest = ArrayList<String>()
-        groupTest.add("Avengers")
-        groupTest.add("Terminator")
-        groupTest.add("Silence of the lambs")
-        groupTest.add("Toy Story")
-        groupTest.add("Glib jocks quiz nymph to vex dwarf")
-
-
         return root
     }
 
@@ -92,13 +85,12 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
                 if (result.isEmpty) {
                     textViewNoMatches.text = getString(R.string.nomatches)
                 } else {
-                    var matchPercentages: HashMap<Int, Double> = HashMap()
                     var superLikes: ArrayList<String>
                     var likes: ArrayList<String>
                     var notTodays: ArrayList<String>
                     var nevers: ArrayList<String>
                     for (document in result) {
-                        var movieId = document.id.toInt()
+                        movieId = document.id
 
                         superLikes = if (document.get("Super like") != null) {
                             document.get("Super like") as ArrayList<String>
@@ -121,29 +113,44 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
                             arrayListOf()
                         }
 
-                        var superLikesInt = superLikes.size.toDouble()
-                        var likesInt = likes.size.toDouble()
-                        var notTodaysInt = notTodays.size
-                        var neversInt = nevers.size.toDouble()
+                        var superLikesDouble = superLikes.size.toDouble()
+                        var likesDouble = likes.size.toDouble()
+                        var notTodayDouble = notTodays.size
+                        var neverDouble = nevers.size.toDouble()
 
-                        var matchPercentage = (superLikesInt+superLikesInt/groupSize+likesInt-neversInt)*100/groupSize
+                        var tempGroupSize = groupSize + superLikesDouble.toInt() + neverDouble.toInt()
+                        var matchPercentage = (2*superLikesDouble+likesDouble)*100/tempGroupSize
 
+                        //Sort of bad previous solution to calculating match percentage (could go under 0 and over 100)
+//                        var matchPercentage = (superLikesDouble+superLikesDouble/groupSize+likesDouble-neverDouble)*100/groupSize
+//                        if (matchPercentage < 0) {
+//                            matchPercentage = 0.0
+//                        } else if (matchPercentage > 100) {
+//                            matchPercentage = 100.0
+//                        }
 
+                        //doesn't work yet
+                        getMovieFromId()
 
-                        matchPercentages[movieId] = matchPercentage
+                        // right now title is also movieId but should be title when that works
+                        var match = Match(movieId,movieId,matchPercentage.toString())
+                        matchArrayList.add(match)
 
                         Log.i(TAG, "MovieID: $movieId")
-                        Log.i(TAG, "Super: $superLikesInt")
-                        Log.i(TAG, "Like: $likesInt")
-                        Log.i(TAG, "Not: $notTodaysInt")
-                        Log.i(TAG, "Never: $neversInt")
+                        Log.i(TAG, "Super: $superLikesDouble")
+                        Log.i(TAG, "Like: $likesDouble")
+                        Log.i(TAG, "Not: $notTodayDouble")
+                        Log.i(TAG, "Never: $neverDouble")
                         Log.i(TAG, "match percentage: $matchPercentage")
                     }
+
+
+                    var sortedList = matchArrayList.sortedWith(compareBy { it.matchPercentage }).reversed()
 
                     //Making the recyclerview adapter thing
                     linearLayoutManager = LinearLayoutManager(context)
                     matchRecyclerView.layoutManager = linearLayoutManager
-                    adapter = MatchAdapter(matchArrayList)
+                    adapter = MatchAdapter(sortedList as MutableList<Match>)
                     matchRecyclerView.adapter = adapter
                 }
             }.addOnFailureListener { exception ->
@@ -223,5 +230,8 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
             buttonViewMembers -> Toast.makeText(activity, "ViewMembers", Toast.LENGTH_SHORT).show()
             buttonLeave -> leaveGroup()
         }
+    }
+
+    private fun getMovieFromId() {
     }
 }

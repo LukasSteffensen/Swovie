@@ -24,7 +24,7 @@ class MatchAdapter (private val matches: MutableList<Match>) : RecyclerView.Adap
 
     override fun onBindViewHolder(holder: MatchViewHolder, position: Int) {
         holder.matchTextView.text = matches[position].title
-        holder.textViewPercentage.text = matches[position].matchPercentage
+        holder.textViewPercentage.text = "%.2f".format(matches[position].matchPercentage?.toDouble())
 
     }
 
