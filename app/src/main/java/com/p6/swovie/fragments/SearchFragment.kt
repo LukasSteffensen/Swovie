@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +20,7 @@ import com.p6.swovie.dataClasses.Movie
 class SearchFragment : Fragment() {
 
     private lateinit var buttonSearch: Button
+    private lateinit var searchView: SearchView
     private lateinit var moviesRecyclerView: RecyclerView
     private lateinit var gridLayoutManager: GridLayoutManager
     private lateinit var popularMoviesAdapter: MoviesAdapter
@@ -32,6 +35,8 @@ class SearchFragment : Fragment() {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_search, container, false)
 
+        searchView = root.findViewById(R.id.searchView)
+
         //Showing popular movies in RecyclerView (scrollable, vertical)
         moviesRecyclerView = root.findViewById(R.id.recyclerView_movies)
         gridLayoutManager = GridLayoutManager(context, 3, LinearLayoutManager.VERTICAL, false)
@@ -43,8 +48,40 @@ class SearchFragment : Fragment() {
 
         getPopularMovies()
 
+        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                getSearchedMovies(query.toString())
+                return true
+            }
+
+            override fun onQueryTextChange(query: String?): Boolean {
+                getSearchedMovies(query.toString())
+                return true
+            }
+        })
+
         return root
     }
+
+    private fun getSearchedMovies(query: String) {
+        MoviesRepository.getSearchedMovies(
+            query,
+            onSuccess = ::onSearchedMoviesFetched,
+            onError = ::onSearchError
+        )
+    }
+
+    private fun onSearchedMoviesFetched(movies: List<Movie>) {
+        Log.d("SearchFragment", "Movies: $movies")
+        popularMoviesAdapter.appendMovies(movies)
+        attachPopularMoviesOnScrollListener()
+        popularMoviesAdapter.notifyDataSetChanged()
+    }
+
+    private fun onSearchError() { //Used in getPopularMovies
+        Toast.makeText(activity, "Error fetching searched movies", Toast.LENGTH_SHORT).show()
+    }
+
 
     private fun attachPopularMoviesOnScrollListener() { //Basically updates when scrolling, showing movies as you scroll
         moviesRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -83,8 +120,7 @@ class SearchFragment : Fragment() {
 
     private fun onPopularMoviesFetched(movies: List<Movie>) { //Used in getPopularMovies. Fetch data if success
         Log.d("SearchFragment", "Movies: $movies")
-        popularMoviesAdapter.appendMovies(movies)
-        attachPopularMoviesOnScrollListener()
+        //TODO change adapter to show searched movies
     }
 
     private fun onError() { //Used in getPopularMovies
