@@ -1,6 +1,7 @@
 package com.p6.swovie.fragments
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,6 +20,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 import com.p6.swovie.MatchAdapter
 import com.p6.swovie.MoviesRepository
 import com.p6.swovie.R
@@ -167,11 +169,13 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
                     //Delete group if you are the last group member
                     docRef.delete()
                         .addOnSuccessListener {
+                            deleteSharedPreferencesList(requireContext())
                             replaceFragment(matchFragment)
                             Log.d(TAG, "DocumentSnapshot successfully deleted!")
                         }
                         .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
                 } else {
+                    deleteSharedPreferencesList(requireContext())
                     // remove user from group
                     val updates = hashMapOf<String, Any>(
                         "users" to FieldValue.arrayRemove(uid)
@@ -183,8 +187,18 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
                         }
                     replaceFragment(matchFragment)
                 }
+            }.addOnFailureListener { e ->
+                Log.i(TAG, e.toString())
             }
         //TODO Delete user's swipes from the group in firestore
+    }
+
+    private fun deleteSharedPreferencesList(context: Context) {
+        val mPrefs: SharedPreferences =
+            context.getSharedPreferences("savedMovieList", Context.MODE_PRIVATE)
+        val prefsEditor = mPrefs.edit()
+        prefsEditor.clear()
+        prefsEditor.commit()
     }
 
     private fun getGroupCode() {
@@ -224,9 +238,11 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onClick(v: View?) {
-        when (view) {
+        when (v) {
             buttonViewMembers -> Toast.makeText(activity, "ViewMembers", Toast.LENGTH_SHORT).show()
-            buttonLeave -> leaveGroup()
+            buttonLeave -> {
+                leaveGroup()
+            }
         }
     }
 

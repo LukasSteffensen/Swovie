@@ -1,6 +1,8 @@
 package com.p6.swovie.fragments
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,17 +15,20 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.google.common.reflect.TypeToken
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 import com.p6.swovie.*
 import com.p6.swovie.R
 import com.p6.swovie.dataClasses.Movie
 import com.yuyakaido.android.cardstackview.*
-import com.yuyakaido.android.cardstackview.internal.CardStackSmoothScroller
 import okhttp3.OkHttpClient
+import java.lang.reflect.Type
+import java.util.*
 
 
 class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
@@ -49,7 +54,8 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     private lateinit var uid: String
     private lateinit var groupCode: String
     private lateinit var cardStackView: CardStackView
-    private lateinit var movieList: MutableList<Movie>
+    private var movieList: MutableList<Movie> = arrayListOf()
+    private lateinit var swipedMoviesList: MutableList<Movie>
 
     private lateinit var buttonNever: ImageButton
     private lateinit var buttonNotToday: ImageButton
@@ -58,8 +64,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     private lateinit var buttonFilter: Button
     private lateinit var buttonMatches: Button
     private var popularMoviesPage: Int = 1
-    private var doOnce = 1
-
+    private var hasSwipedBefore = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -128,9 +133,46 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         matchFragment = MatchFragment()
         secondMatchFragment = SecondMatchFragment()
 
-        loadMoreMovies()
+        adapter = CardStackAdapter(movieList)
+        cardStackView.layoutManager = manager
+        cardStackView.adapter = adapter
+        cardStackView.itemAnimator = DefaultItemAnimator()
+
+        swipedMoviesList = loadSharedPreferencesList(requireContext())
+        Log.i(TAG, "Movies that have been swiped before $swipedMoviesList")
+        hasSwipedBefore = !swipedMoviesList.isNullOrEmpty()
 
         return root
+    }
+
+    override fun onStart() {
+        loadMoreMovies()
+        super.onStart()
+    }
+
+    private fun saveSharedPreferencesList(context: Context, list: MutableList<Movie>) {
+        val mPrefs: SharedPreferences =
+            context.getSharedPreferences("savedMovieList", Context.MODE_PRIVATE)
+        val prefsEditor = mPrefs.edit()
+        val gson = Gson()
+        val json = gson.toJson(list)
+        Log.i(TAG, json.toString())
+        prefsEditor.putString("myJson", json)
+        prefsEditor.apply()
+    }
+
+    private fun loadSharedPreferencesList(context: Context): MutableList<Movie> {
+        val savedMovies: MutableList<Movie>
+        val mPrefs = context.getSharedPreferences("savedMovieList", Context.MODE_PRIVATE)
+        val gson = Gson()
+        val json = mPrefs.getString("myJson", "")
+        savedMovies = if (json!!.isEmpty()) {
+            ArrayList()
+        } else {
+            val type: Type = object : TypeToken<MutableList<Movie>?>() {}.type
+            gson.fromJson(json, type)
+        }
+        return savedMovies
     }
 
     override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
@@ -187,27 +229,38 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
 
     private fun onPopularMoviesFetched(movies: List<Movie>) {
         Log.d("MovieFragment", "Movies: $movies")
-        movieList = movies as MutableList<Movie>
-        if (doOnce == 1) {
-            adapter = CardStackAdapter(movies as MutableList<Movie>)
+        if (!hasSwipedBefore) {
+            movieList = movies as MutableList<Movie>
+            movieList.addAll(movies)
+            adapter = CardStackAdapter(movies)
             cardStackView.layoutManager = manager
             cardStackView.adapter = adapter
             cardStackView.itemAnimator = DefaultItemAnimator()
             Log.i(TAG, "should only be called once")
-            doOnce = 14
         } else {
             movieList.addAll(movies)
-            adapter.updateList(movies as MutableList<Movie>)
-            var previousPosition = manager.topPosition
-            adapter.notifyDataSetChanged()
-            manager.topPosition = previousPosition
-            Log.i(
-                TAG,
-                "\nMovies in adapter: ${adapter.itemCount}\n Movies left in manager: ${manager.topPosition}"
-            )
+            updateAdapter(movieList)
         }
+        if (swipedMoviesList.size > movieList.size) {
+            loadMoreMovies()
+        } else {
+            movieList.removeAll(swipedMoviesList)
+            Log.i(TAG, "Removed elements")
+            Log.i(TAG, movieList.toString())
+            adapter.setList(movieList)
+            adapter.notifyDataSetChanged()
+        }
+
         popularMoviesPage++
     }
+
+    private fun updateAdapter(list: MutableList<Movie>){
+        adapter.setList(list)
+        val previousPosition = manager.topPosition
+        adapter.notifyDataSetChanged()
+        manager.topPosition = previousPosition
+    }
+
 
     private fun loadMoreMovies() {
         MoviesRepository.getPopularMovies(
@@ -248,16 +301,16 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     override fun onCardSwiped(direction: Direction?) {
         when (direction) {
             Direction.Right -> {
-                saveSwipeToDatabase(like, true)
+                saveSwipeToDatabase(like)
             }
             Direction.Left -> {
-                saveSwipeToDatabase(notToday, true)
+                saveSwipeToDatabase(notToday)
             }
             Direction.Top -> {
-                saveSwipeToDatabase(superLike, true)
+                saveSwipeToDatabase(superLike)
             }
             Direction.Bottom -> {
-                saveSwipeToDatabase(never, true)
+                saveSwipeToDatabase(never)
             }
         }
         Log.i(
@@ -286,23 +339,19 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
 
     }
 
-    private fun saveSwipeToDatabase(swipe: Int, isSwipePhysical: Boolean) {
+    private fun saveSwipeToDatabase(swipe: Int) {
 
         var movieId: Long = 0
 
-        if (isSwipePhysical){
-            movieId = movieList[manager.topPosition - 1].id
-            Log.i(
-                TAG, "movie id: ${movieList[manager.topPosition - 1].id}" +
-                        " movie title: ${movieList[manager.topPosition - 1].title}"
-            )
-        } else {
-            movieId = movieList[manager.topPosition].id
-            Log.i(
-                TAG, "movie id: ${movieList[manager.topPosition].id}" +
-                        " movie title: ${movieList[manager.topPosition].title}"
-            )
-        }
+        swipedMoviesList.add(movieList[manager.topPosition-1])
+        saveSharedPreferencesList(requireContext(), swipedMoviesList)
+
+        movieId = movieList[manager.topPosition - 1].id
+        Log.i(
+            TAG, "movie id: ${movieList[manager.topPosition - 1].id}" +
+                    " movie title: ${movieList[manager.topPosition - 1].title}"
+        )
+
 
         val updates = hashMapOf<String, Any>(
             when (swipe) {
