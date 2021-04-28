@@ -142,9 +142,12 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         Log.i(TAG, "Movies that have been swiped before $swipedMoviesList")
         hasSwipedBefore = !swipedMoviesList.isNullOrEmpty()
 
-        loadMoreMovies()
-
         return root
+    }
+
+    override fun onStart() {
+        loadMoreMovies()
+        super.onStart()
     }
 
     private fun saveSharedPreferencesList(context: Context, list: MutableList<Movie>) {

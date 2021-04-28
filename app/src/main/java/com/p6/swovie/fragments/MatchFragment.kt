@@ -2,6 +2,7 @@ package com.p6.swovie.fragments
 
 import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -110,7 +111,13 @@ class MatchFragment : Fragment(), View.OnClickListener {
         }
     }
 
-
+    private fun deleteSharedPreferencesList(context: Context) {
+        val mPrefs: SharedPreferences =
+            context.getSharedPreferences("savedMovieList", Context.MODE_PRIVATE)
+        val prefsEditor = mPrefs.edit()
+        prefsEditor.clear()
+        prefsEditor.commit()
+    }
 
     override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
         when (view) {
@@ -137,6 +144,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
                 "users" to FieldValue.arrayUnion(uid)
             )
             docRef.update(updates).addOnSuccessListener {
+                deleteSharedPreferencesList(requireContext())
                 replaceFragment(secondMatchFragment)
             }.addOnFailureListener {
                 toast("Group $code does not exist")
@@ -162,6 +170,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
         db.collection("rooms")
             .document(groupCode).set(group)
             .addOnSuccessListener {
+                deleteSharedPreferencesList(requireContext())
                 Log.d(TAG, "DocumentSnapshot added with ID: $groupCode")
             }
 
