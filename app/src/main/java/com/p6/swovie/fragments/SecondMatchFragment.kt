@@ -23,6 +23,7 @@ import com.p6.swovie.MatchAdapter
 import com.p6.swovie.MoviesRepository
 import com.p6.swovie.R
 import com.p6.swovie.dataClasses.Match
+import com.p6.swovie.dataClasses.Movie
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -40,6 +41,8 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
 
     private lateinit var uid: String
     private lateinit var movieId: String
+    private lateinit var movie: Movie
+    private var matchPercentage: Double = 0.0
     private lateinit var groupCode: String
     private var groupSize: Int = 0
 
@@ -113,7 +116,7 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
                             arrayListOf()
                         }
 
-                        var superLikesDouble = superLikes.size.toDouble()
+                        val superLikesDouble = superLikes.size.toDouble()
                         var likesDouble = likes.size.toDouble()
                         var notTodayDouble = notTodays.size
                         var neverDouble = nevers.size.toDouble()
@@ -129,12 +132,9 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
 //                            matchPercentage = 100.0
 //                        }
 
-                        //doesn't work yet
                         getMovieFromId()
 
                         // right now title is also movieId but should be title when that works
-                        var match = Match(movieId,movieId,matchPercentage.toString())
-                        matchArrayList.add(match)
 
                         Log.i(TAG, "MovieID: $movieId")
                         Log.i(TAG, "Super: $superLikesDouble")
@@ -143,8 +143,6 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
                         Log.i(TAG, "Never: $neverDouble")
                         Log.i(TAG, "match percentage: $matchPercentage")
                     }
-
-
                     var sortedList = matchArrayList.sortedWith(compareBy { it.matchPercentage }).reversed()
 
                     //Making the recyclerview adapter thing
@@ -233,5 +231,20 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
     }
 
     private fun getMovieFromId() {
+        MoviesRepository.getMovieDetails(movieId.toInt(),
+            onSuccess = ::onMovieFetched,
+            onError = ::onError
+        )
+    }
+
+    private fun onMovieFetched(movie: Movie) { //Used in getPopularMovies. Fetch data if success
+        Log.d(TAG, "Movie: $movie")
+        Log.i(TAG, "Movie: ${movie.id} and ${movie.title}")
+        var match = Match(movie.id.toString(),movie.title,matchPercentage.toString())
+        matchArrayList.add(match)
+    }
+
+    private fun onError() { //Used in getPopularMovies
+        toast("Error fetching movie")
     }
 }

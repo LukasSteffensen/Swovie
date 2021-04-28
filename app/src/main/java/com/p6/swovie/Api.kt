@@ -25,11 +25,12 @@ interface Api {
     ): Call<GetMoviesResponse>
 
     @GET(MOVIE_DETAILS)
-    fun getMovieDetails(@Path(PARAM_MOVIE_ID) movieId: Int
+    fun getMovieDetails(@Path(PARAM_MOVIE_ID) movieId: Int,
+        @Query("api_key") apiKey: String = "9870f62e69820872d263749cf1055bc1"
     //                 , @Query(PARAM_LANGUAGE) language: String = "en-US"
     ): Call<Movie>
 
-    /* Search but doesn't work yet
+    /* Search but doesn't work yet but would be cool
     @GET("search/movie")
     fun getMoviesList(@Query("query") query: String?,@Query("api_key") api_key:String, @Query("page") page: Int?
     ): Single<SearchResponse>
