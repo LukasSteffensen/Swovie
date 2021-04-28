@@ -20,14 +20,12 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.gson.Gson
 import com.p6.swovie.MatchAdapter
 import com.p6.swovie.MoviesRepository
 import com.p6.swovie.R
 import com.p6.swovie.dataClasses.Match
 import com.p6.swovie.dataClasses.Movie
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 
 class SecondMatchFragment : Fragment(), View.OnClickListener {
@@ -44,6 +42,7 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
     private lateinit var uid: String
     private lateinit var movieId: String
     private lateinit var movie: Movie
+    private var colSize = 0
     private var matchPercentage: Double = 0.0
     private lateinit var groupCode: String
     private var groupSize: Int = 0
@@ -72,9 +71,14 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
         buttonViewMembers.setOnClickListener(this)
         buttonLeave.setOnClickListener(this)
 
-        getGroupCode()
 
         return root
+    }
+
+    override fun onResume() {
+        matchArrayList = arrayListOf()
+        getGroupCode()
+        super.onResume()
     }
 
     private fun getSwipes() {
@@ -94,6 +98,7 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
                     var likes: ArrayList<String>
                     var notTodays: ArrayList<String>
                     var nevers: ArrayList<String>
+                    colSize = result.size()
                     for (document in result) {
                         movieId = document.id
 
@@ -119,12 +124,15 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
                         }
 
                         val superLikesDouble = superLikes.size.toDouble()
-                        var likesDouble = likes.size.toDouble()
-                        var notTodayDouble = notTodays.size
-                        var neverDouble = nevers.size.toDouble()
+                        val likesDouble = likes.size.toDouble()
+                        val notTodayDouble = notTodays.size
+                        val neverDouble = nevers.size.toDouble()
 
                         var tempGroupSize = groupSize + superLikesDouble.toInt() + neverDouble.toInt()
-                        var matchPercentage = (2*superLikesDouble+likesDouble)*100/tempGroupSize
+                        matchPercentage = (2*superLikesDouble+likesDouble)*100/tempGroupSize
+
+                        val match = Match(movieId,"",matchPercentage.toString(), "")
+                        matchArrayList.add(match)
 
                         //Sort of bad previous solution to calculating match percentage (could go under 0 and over 100)
 //                        var matchPercentage = (superLikesDouble+superLikesDouble/groupSize+likesDouble-neverDouble)*100/groupSize
@@ -134,10 +142,6 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
 //                            matchPercentage = 100.0
 //                        }
 
-                        getMovieFromId()
-
-                        // right now title is also movieId but should be title when that works
-
                         Log.i(TAG, "MovieID: $movieId")
                         Log.i(TAG, "Super: $superLikesDouble")
                         Log.i(TAG, "Like: $likesDouble")
@@ -145,17 +149,17 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
                         Log.i(TAG, "Never: $neverDouble")
                         Log.i(TAG, "match percentage: $matchPercentage")
                     }
-                    var sortedList = matchArrayList.sortedWith(compareBy { it.matchPercentage }).reversed()
-
-                    //Making the recyclerview adapter thing
-                    linearLayoutManager = LinearLayoutManager(context)
-                    matchRecyclerView.layoutManager = linearLayoutManager
-                    adapter = MatchAdapter(sortedList as MutableList<Match>)
-                    matchRecyclerView.adapter = adapter
+                    setMovieTitles()
                 }
             }.addOnFailureListener { exception ->
                 Log.d(TAG, "get failed with ", exception)
             }
+    }
+
+    private fun setMovieTitles() {
+        for (match in matchArrayList){
+            getMovieFromId(match.movieId!!.toInt())
+        }
     }
 
     private fun leaveGroup() {
@@ -246,8 +250,8 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    private fun getMovieFromId() {
-        MoviesRepository.getMovieDetails(movieId.toInt(),
+    private fun getMovieFromId(movieId: Int) {
+        MoviesRepository.getMovieDetails(movieId,
             onSuccess = ::onMovieFetched,
             onError = ::onError
         )
@@ -256,8 +260,25 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
     private fun onMovieFetched(movie: Movie) { //Used in getPopularMovies. Fetch data if success
         Log.d(TAG, "Movie: $movie")
         Log.i(TAG, "Movie: ${movie.id} and ${movie.title}")
-        var match = Match(movie.id.toString(),movie.title,matchPercentage.toString())
-        matchArrayList.add(match)
+        val index = matchArrayList.indexOfFirst{
+            it.movieId == movie.id.toString()
+        }
+        matchArrayList[index].title = movie.title
+        matchArrayList[index].posterPath = movie.posterPath
+        colSize--
+        if (colSize == 0) {
+            setAdapter(matchArrayList)
+        }
+    }
+
+    private fun setAdapter(matchArrayList: ArrayList<Match>) {
+        var sortedList = matchArrayList.sortedWith(compareBy { it.matchPercentage }).reversed()
+
+        //Making the recyclerview adapter thing
+        linearLayoutManager = LinearLayoutManager(context)
+        matchRecyclerView.layoutManager = linearLayoutManager
+        adapter = MatchAdapter(sortedList as MutableList<Match>)
+        matchRecyclerView.adapter = adapter
     }
 
     private fun onError() { //Used in getPopularMovies

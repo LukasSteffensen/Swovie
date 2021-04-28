@@ -26,7 +26,7 @@
             android:text="@string/movie"
             android:textColor="@color/primary_dark"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView_match_poster"
+            app:layout_constraintStart_toEndOf="@+id/image_view"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
@@ -42,14 +42,13 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <ImageView
-            android:id="@+id/imageView_match_poster"
+            android:id="@+id/image_view"
             android:layout_width="92dp"
             android:layout_height="136dp"
             android:contentDescription="@string/movie"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/avengers_poster" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textView_match_percentage"
@@ -60,7 +59,7 @@
             android:layout_marginBottom="16dp"
             android:textColor="@color/primary_dark"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView_match_poster" />
+            app:layout_constraintStart_toEndOf="@+id/image_view" />
 
         <TextView
             android:id="@+id/textView_match_percentage2"
