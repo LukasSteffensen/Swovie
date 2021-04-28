@@ -47,4 +47,8 @@ object MoviesRepository {
                     }
                 })
     }
+
+    fun getMovieDetails(movieId: Int) {
+        api.getMovieDetails(movieId)
+    }
 }

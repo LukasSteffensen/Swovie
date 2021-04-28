@@ -12,7 +12,6 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -21,9 +20,11 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.p6.swovie.MatchAdapter
+import com.p6.swovie.MoviesRepository
 import com.p6.swovie.R
-import java.util.*
+import com.p6.swovie.dataClasses.Match
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 class SecondMatchFragment : Fragment(), View.OnClickListener {
@@ -36,14 +37,17 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
     private lateinit var buttonLeave: Button
     private lateinit var textViewGroup: TextView
     private lateinit var textViewNoMatches: TextView
+
     private lateinit var uid: String
     private lateinit var movieId: String
     private lateinit var groupCode: String
-    private var arraylist = arrayListOf("Hulk", "Sherk")
-    private var arraylist2 = arrayListOf<String>()
+    private var groupSize: Int = 0
+
+    private var matchArrayList: ArrayList<Match> = arrayListOf()
     private lateinit var adapter: MatchAdapter
     private lateinit var matchRecyclerView: RecyclerView
     private lateinit var linearLayoutManager: LinearLayoutManager
+
     var auth: FirebaseAuth = Firebase.auth
     val db = Firebase.firestore
 
@@ -65,48 +69,89 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
 
         getGroupCode()
 
-        val groupTest = ArrayList<String>()
-        groupTest.add("Avengers")
-        groupTest.add("Terminator")
-        groupTest.add("Silence of the lambs")
-        groupTest.add("Toy Story")
-        groupTest.add("Glib jocks quiz nymph to vex dwarf")
-
-
         return root
     }
 
-    override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
-        when (view) {
-            buttonViewMembers -> Toast.makeText(activity, "ViewMembers", Toast.LENGTH_SHORT).show()
-            buttonLeave -> leaveGroup()
-        }
-    }
-
     private fun getSwipes() {
-
-        movieId = "movieId2" //Put actual movie id here soon
 
         val colRef = db.collection("rooms")
             .document(groupCode)
             .collection("swipes")
 
-        //get movie document
+        //get swipes collection
         colRef
             .get()
             .addOnSuccessListener { result ->
                 if (result.isEmpty) {
                     textViewNoMatches.text = getString(R.string.nomatches)
                 } else {
+                    var superLikes: ArrayList<String>
+                    var likes: ArrayList<String>
+                    var notTodays: ArrayList<String>
+                    var nevers: ArrayList<String>
+                    for (document in result) {
+                        movieId = document.id
+
+                        superLikes = if (document.get("Super like") != null) {
+                            document.get("Super like") as ArrayList<String>
+                        } else {
+                            arrayListOf()
+                        }
+                        likes = if (document.get("Like") != null) {
+                            document.get("Like") as ArrayList<String>
+                        } else {
+                            arrayListOf()
+                        }
+                        notTodays = if (document.get("Not today") != null) {
+                            document.get("Not today") as ArrayList<String>
+                        } else {
+                            arrayListOf()
+                        }
+                        nevers = if (document.get("Never") != null) {
+                            document.get("Never") as ArrayList<String>
+                        } else {
+                            arrayListOf()
+                        }
+
+                        var superLikesDouble = superLikes.size.toDouble()
+                        var likesDouble = likes.size.toDouble()
+                        var notTodayDouble = notTodays.size
+                        var neverDouble = nevers.size.toDouble()
+
+                        var tempGroupSize = groupSize + superLikesDouble.toInt() + neverDouble.toInt()
+                        var matchPercentage = (2*superLikesDouble+likesDouble)*100/tempGroupSize
+
+                        //Sort of bad previous solution to calculating match percentage (could go under 0 and over 100)
+//                        var matchPercentage = (superLikesDouble+superLikesDouble/groupSize+likesDouble-neverDouble)*100/groupSize
+//                        if (matchPercentage < 0) {
+//                            matchPercentage = 0.0
+//                        } else if (matchPercentage > 100) {
+//                            matchPercentage = 100.0
+//                        }
+
+                        //doesn't work yet
+                        getMovieFromId()
+
+                        // right now title is also movieId but should be title when that works
+                        var match = Match(movieId,movieId,matchPercentage.toString())
+                        matchArrayList.add(match)
+
+                        Log.i(TAG, "MovieID: $movieId")
+                        Log.i(TAG, "Super: $superLikesDouble")
+                        Log.i(TAG, "Like: $likesDouble")
+                        Log.i(TAG, "Not: $notTodayDouble")
+                        Log.i(TAG, "Never: $neverDouble")
+                        Log.i(TAG, "match percentage: $matchPercentage")
+                    }
+
+
+                    var sortedList = matchArrayList.sortedWith(compareBy { it.matchPercentage }).reversed()
+
                     //Making the recyclerview adapter thing
                     linearLayoutManager = LinearLayoutManager(context)
                     matchRecyclerView.layoutManager = linearLayoutManager
-                    adapter = MatchAdapter(arraylist)
+                    adapter = MatchAdapter(sortedList as MutableList<Match>)
                     matchRecyclerView.adapter = adapter
-
-                    for (document in result) {
-                        Log.i(TAG, document.toString())
-                    }
                 }
             }.addOnFailureListener { exception ->
                 Log.d(TAG, "get failed with ", exception)
@@ -146,9 +191,12 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
 
     private fun getGroupCode() {
         uid = auth.currentUser.uid
-        db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
+        db.collection("rooms").whereArrayContains("users", uid).get()
             .addOnSuccessListener { document ->
                 groupCode = document.documents[0].id
+                var groupArrayList: ArrayList<String> = arrayListOf<String>()
+                groupArrayList = document.documents[0].get("users") as ArrayList<String>
+                groupSize = groupArrayList.size
                 getSwipes()
                 Log.i(TAG, "group code: $groupCode")
                 textViewGroup.text = "Group code: $groupCode"
@@ -175,5 +223,15 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
             replace(R.id.fl_wrapper, fragment)
             commit()
         }
+    }
+
+    override fun onClick(v: View?) {
+        when (view) {
+            buttonViewMembers -> Toast.makeText(activity, "ViewMembers", Toast.LENGTH_SHORT).show()
+            buttonLeave -> leaveGroup()
+        }
+    }
+
+    private fun getMovieFromId() {
     }
 }

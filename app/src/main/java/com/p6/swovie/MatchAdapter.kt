@@ -5,9 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.p6.swovie.dataClasses.Group
+import com.p6.swovie.dataClasses.Match
 
-class MatchAdapter (private val match: MutableList<String>) : RecyclerView.Adapter<MatchAdapter.MatchViewHolder>(){
+class MatchAdapter (private val matches: MutableList<Match>) : RecyclerView.Adapter<MatchAdapter.MatchViewHolder>(){
 
     class MatchViewHolder(matchView: View) : RecyclerView.ViewHolder(matchView) {
 
@@ -23,14 +23,12 @@ class MatchAdapter (private val match: MutableList<String>) : RecyclerView.Adapt
     }
 
     override fun onBindViewHolder(holder: MatchViewHolder, position: Int) {
-        holder.matchTextView.text = match[position]
-
-        val randomPercentage = (0..100).random()
-        holder.textViewPercentage.text = randomPercentage.toString()
+        holder.matchTextView.text = matches[position].title
+        holder.textViewPercentage.text = "%.2f".format(matches[position].matchPercentage?.toDouble())
 
     }
 
     override fun getItemCount(): Int {
-        return match.size
+        return matches.size
     }
 }
