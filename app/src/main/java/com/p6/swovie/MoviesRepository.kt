@@ -48,8 +48,8 @@ object MoviesRepository {
                 })
     }
 
-    fun getSearchedMovies(query: String, page: Int = 1, onSuccess: (movies: List<Movie>) -> Unit, onError: () -> Unit) {
-        api.getMoviesList(query = query).enqueue(object : Callback<GetMoviesResponse> {
+    fun getSearchedMovies(query: String, page: Int, onSuccess: (movies: List<Movie>) -> Unit, onError: () -> Unit) {
+        api.getMoviesList(query = query, page = page).enqueue(object : Callback<GetMoviesResponse> {
             override fun onResponse(
                 call: Call<GetMoviesResponse>,
                 response: Response<GetMoviesResponse>

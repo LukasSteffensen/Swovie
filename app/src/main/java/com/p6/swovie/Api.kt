@@ -34,7 +34,7 @@ interface Api {
     @GET("search/movie")
     fun getMoviesList(
         @Query("query") query: String?,
-        @Query("api_key") apiKey: String = "9870f62e69820872d263749cf1055bc1"
-        //@Query("page") page: Int?
+        @Query("api_key") apiKey: String = "9870f62e69820872d263749cf1055bc1",
+        @Query("page") page: Int?
     ): Call<GetMoviesResponse>
 }

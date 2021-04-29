@@ -33,6 +33,9 @@ class MoviesAdapter (private var movies: MutableList<Movie>, private val onMovie
         )
     }
 
+    fun setList(list: MutableList<Movie>){
+        this.movies = list
+    }
 
     inner class MovieViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         //ViewHolder used in the Adapter, adding card in RecyclerView
