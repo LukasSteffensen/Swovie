@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
@@ -111,9 +112,9 @@ class MatchFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    private fun deleteSharedPreferencesList(context: Context) {
+    private fun deleteSharedPreferencesList() {
         val mPrefs: SharedPreferences =
-            context.getSharedPreferences("savedMovieList", Context.MODE_PRIVATE)
+            activity!!.getSharedPreferences("savedMovieList", Context.MODE_PRIVATE)
         val prefsEditor = mPrefs.edit()
         prefsEditor.clear()
         prefsEditor.commit()
@@ -144,7 +145,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
                 "users" to FieldValue.arrayUnion(uid)
             )
             docRef.update(updates).addOnSuccessListener {
-                deleteSharedPreferencesList(requireContext())
+                deleteSharedPreferencesList()
                 replaceFragment(secondMatchFragment)
             }.addOnFailureListener {
                 toast("Group $code does not exist")
@@ -170,10 +171,9 @@ class MatchFragment : Fragment(), View.OnClickListener {
         db.collection("rooms")
             .document(groupCode).set(group)
             .addOnSuccessListener {
-                deleteSharedPreferencesList(requireContext())
+                deleteSharedPreferencesList()
                 Log.d(TAG, "DocumentSnapshot added with ID: $groupCode")
             }
-
     }
 
     private fun toast(message: String) {

@@ -51,5 +51,4 @@ class CardStackAdapter (private var movies: MutableList<Movie>): RecyclerView.Ad
                 .into(image)
         }
     }
-
 }
