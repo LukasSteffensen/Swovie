@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.p6.swovie.dataClasses.Match
 
 class MatchAdapter (private val matches: MutableList<Match>) : RecyclerView.Adapter<MatchAdapter.MatchViewHolder>(){
@@ -40,4 +41,5 @@ class MatchAdapter (private val matches: MutableList<Match>) : RecyclerView.Adap
     override fun getItemCount(): Int {
         return matches.size
     }
+
 }

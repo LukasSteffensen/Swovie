@@ -15,6 +15,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.common.io.Files.append
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
@@ -162,6 +164,45 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
         }
     }
 
+    private fun viewMembers() {
+
+        val docRef = db.collection("rooms").document(groupCode)
+        docRef.get()
+            .addOnCompleteListener { task ->
+
+                val document = task.result
+                val userIds: ArrayList<String> = document?.get("users") as ArrayList<String>
+                val users = Array(userIds.size){""}
+                Log.i(TAG, userIds.toString())
+
+                var n = 0
+                for (userId in userIds) {
+                    db.collection("users").document(userId)
+                        .get()
+                        .addOnCompleteListener { task2 ->
+                            val document2 = task2.result
+                            users[n] = document2?.data!!["name"].toString()
+                            n++
+                            if (task2.isSuccessful) {
+                                alertDialog(users)
+                            }
+                        }
+                }
+            }
+    }
+
+    private fun alertDialog(array: Array<String>){
+        context?.let {
+            MaterialAlertDialogBuilder(it)
+                .setTitle(resources.getString(R.string.viewmembers))
+                .setItems(array) { dialog, which ->
+                }
+                .setNeutralButton(resources.getString(R.string.alertcancel)) { dialog, which ->
+                }
+                .show()
+        }
+    }
+
     private fun leaveGroup() {
 
         matchFragment = MatchFragment()
@@ -222,14 +263,6 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
             }
     }
 
-    private fun inputAgain(editText: EditText, toast: String) {
-        editText.requestFocus()
-        val imm: InputMethodManager =
-            activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
-        toast(toast)
-    }
-
     private fun toast(message: String) {
         Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
     }
@@ -243,10 +276,8 @@ class SecondMatchFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         when (v) {
-            buttonViewMembers -> Toast.makeText(activity, "ViewMembers", Toast.LENGTH_SHORT).show()
-            buttonLeave -> {
-                leaveGroup()
-            }
+            buttonViewMembers -> viewMembers()
+            buttonLeave -> leaveGroup()
         }
     }
 
