@@ -14,10 +14,11 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.p6.swovie.LoginActivity
 import com.p6.swovie.R
-import com.p6.swovie.dataClasses.generateGroupId
 
 class AccountFragment : Fragment(), View.OnClickListener {
 
@@ -28,6 +29,10 @@ class AccountFragment : Fragment(), View.OnClickListener {
     private lateinit var buttonResetSwipes: Button
     private lateinit var buttonResetPassword: Button
     private lateinit var buttonLogout: Button
+
+    private val db = Firebase.firestore
+    private lateinit var uid: String
+    private val groupCode = "DV3L"
 
     var auth: FirebaseAuth = Firebase.auth
 
@@ -55,6 +60,8 @@ class AccountFragment : Fragment(), View.OnClickListener {
         buttonResetPassword.setOnClickListener(this)
         buttonLogout.setOnClickListener(this)
 
+        uid = auth.currentUser.uid
+
         return root
     }
 
@@ -68,7 +75,18 @@ class AccountFragment : Fragment(), View.OnClickListener {
     }
 
     private fun deleteSwipesFromGroup() {
-        TODO("Not yet implemented")
+        val swipesRef = db.collection("groups")
+            .document(groupCode)
+            .collection("swipes")
+        swipesRef.get().addOnSuccessListener { result ->
+            for (document in result) {
+                // Atomically remove a region from the "regions" array field.
+                document.reference.update("Super like", FieldValue.arrayRemove(uid))
+                document.reference.update("Like", FieldValue.arrayRemove(uid))
+                document.reference.update("Not today", FieldValue.arrayRemove(uid))
+                document.reference.update("Never", FieldValue.arrayRemove(uid))
+            }
+        }
     }
 
     private fun alert(title: String, message: String, button: Button){ //Making an alert dialog
@@ -107,7 +125,6 @@ class AccountFragment : Fragment(), View.OnClickListener {
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             toast("An email has been sent with a link to reset your password")
-
                             Log.d(TAG, "Email sent.")
                         }
                     }

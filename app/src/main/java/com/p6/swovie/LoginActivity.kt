@@ -60,17 +60,20 @@ class LoginActivity : AppCompatActivity() {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success")
                             val user = auth.currentUser
-                            val intent = Intent(this, MainActivity::class.java)
-                            intent.putExtra("user", user)
-                            startActivity(intent)
+                            if (user.isEmailVerified) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d(TAG, "signInWithEmail:success")
+                                val intent = Intent(this, MainActivity::class.java)
+                                intent.putExtra("user", user)
+                                startActivity(intent)
+                            } else {
+                                toast("Please verify your email and try again")
+                            }
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.exception)
-                            Toast.makeText(baseContext, "Authentication failed.",
-                                Toast.LENGTH_SHORT).show()
+                            toast("Authentication failed")
                         }
                     }
             }

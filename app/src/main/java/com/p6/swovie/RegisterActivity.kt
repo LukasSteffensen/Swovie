@@ -133,11 +133,11 @@ class RegisterActivity : AppCompatActivity() {
          db.collection("users")
              .document(userID).set(user)
              .addOnSuccessListener {
-                 Log.d("RegisterActivity: ", "DocumentSnapshot added with ID: $userID")
+                 Log.d(TAG, "DocumentSnapshot added with ID: $userID")
                  auth.signOut()
              }
              .addOnFailureListener { e ->
-                 Log.w("RegisterActivity: ", "Error adding document", e)
+                 Log.w(TAG, "Error adding document", e)
              }
 
          val intent = Intent(this, LoginActivity::class.java)

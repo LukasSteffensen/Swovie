@@ -25,7 +25,7 @@ import kotlin.collections.ArrayList
 
 class CreateGroupFragment : Fragment(), View.OnClickListener {
 
-    private val TAG = "MatchFragment"
+    private val TAG = "CreateGroupFragment"
 
     private lateinit var secondMatchFragment: Fragment
 
@@ -112,7 +112,7 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
 
     private fun deleteSharedPreferencesList() {
         val mPrefs: SharedPreferences =
-            activity!!.getSharedPreferences("savedMovieList", Context.MODE_PRIVATE)
+            activity?.getSharedPreferences("savedMovieList", Context.MODE_PRIVATE)!!
         val prefsEditor = mPrefs.edit()
         prefsEditor.clear()
         prefsEditor.commit()

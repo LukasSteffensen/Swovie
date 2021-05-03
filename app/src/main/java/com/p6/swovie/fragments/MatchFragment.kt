@@ -29,7 +29,7 @@ import kotlin.collections.ArrayList
 
 class MatchFragment : Fragment(), View.OnClickListener {
 
-    private var TAG = "SecondMatchFragment"
+    private var TAG = "MatchFragment"
 
     private lateinit var matchFragment: Fragment
 
@@ -82,7 +82,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
     private fun getSwipes() {
 
-        val colRef = db.collection("rooms")
+        val colRef = db.collection("groups")
             .document(groupCode)
             .collection("swipes")
 
@@ -163,7 +163,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
     private fun viewMembers() {
 
-        val docRef = db.collection("rooms").document(groupCode)
+        val docRef = db.collection("groups").document(groupCode)
         docRef.get()
             .addOnCompleteListener { task ->
 
@@ -203,7 +203,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
     private fun leaveGroup() {
 
         matchFragment = CreateGroupFragment()
-        val docRef = db.collection("rooms").document(groupCode)
+        val docRef = db.collection("groups").document(groupCode)
         docRef.get()
             .addOnSuccessListener { document ->
                 var array: ArrayList<String> = document.get("users") as ArrayList<String>
@@ -245,7 +245,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
     private fun getGroupCode() {
         uid = auth.currentUser.uid
-        db.collection("rooms").whereArrayContains("users", uid).get()
+        db.collection("groups").whereArrayContains("users", uid).get()
             .addOnSuccessListener { document ->
                 groupCode = document.documents[0].id
                 var groupArrayList: ArrayList<String> = arrayListOf<String>()
