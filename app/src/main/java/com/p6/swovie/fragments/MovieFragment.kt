@@ -75,7 +75,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
 
         //set isInGroup boolean
         if (auth.currentUser != null) {
-            db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
+            db.collection("groups").whereArrayContains("users", auth.currentUser.uid).get()
                 .addOnSuccessListener { document ->
                     isInGroup = !document.isEmpty
                     Log.i(TAG, "isInGroup is True")
@@ -89,7 +89,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         uid = auth.currentUser.uid
 
         //get group code
-        db.collection("rooms").whereArrayContains("users", auth.currentUser.uid).get()
+        db.collection("groups").whereArrayContains("users", auth.currentUser.uid).get()
             .addOnSuccessListener { document ->
                 if (!document.isEmpty) {
                     groupCode = document.documents[0].id
@@ -363,7 +363,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
             }
         )
 
-        val docRef = db.collection("rooms")
+        val docRef = db.collection("groups")
             .document(groupCode)
             .collection("swipes")
             .document(movieId.toString())

@@ -60,10 +60,15 @@ class AccountFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(view: View?) { // All OnClick buttons, with strings depending on button
         when (view) {
-            buttonResetSwipes -> alert(getString(R.string.resetswipes), getString(R.string.alertswipes), buttonResetSwipes)
+            buttonResetSwipes -> //working on leave group stuff here
+                deleteSwipesFromGroup()
             buttonResetPassword -> alert(getString(R.string.resetpassword), getString(R.string.alertpassword), buttonResetPassword)
             buttonLogout -> alert(getString(R.string.logout), getString(R.string.alertlogout), buttonLogout)
         }
+    }
+
+    private fun deleteSwipesFromGroup() {
+        TODO("Not yet implemented")
     }
 
     private fun alert(title: String, message: String, button: Button){ //Making an alert dialog

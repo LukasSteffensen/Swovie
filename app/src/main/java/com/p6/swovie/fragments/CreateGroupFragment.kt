@@ -138,7 +138,7 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
         if (code.isEmpty()) {
             //      inputAgain(editTextCode, "Please put in a group code")
         } else {
-            val docRef = db.collection("rooms").document(code)
+            val docRef = db.collection("groups").document(code)
             val updates = hashMapOf<String, Any>(
                 "users" to FieldValue.arrayUnion(uid)
             )
@@ -166,7 +166,7 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
 
         val group = Group(userIdList)
 
-        db.collection("rooms")
+        db.collection("groups")
             .document(groupCode).set(group)
             .addOnSuccessListener {
                 deleteSharedPreferencesList()
