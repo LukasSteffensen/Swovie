@@ -1,48 +1,56 @@
 package com.p6.swovie.fragments
 
-import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.util.Log
-import android.view.*
-import android.view.inputmethod.InputMethodManager
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.p6.swovie.MatchAdapter
+import com.p6.swovie.MoviesRepository
 import com.p6.swovie.R
-import com.p6.swovie.dataClasses.Group
-import com.p6.swovie.dataClasses.generateGroupId
-import java.util.*
+import com.p6.swovie.dataClasses.Match
+import com.p6.swovie.dataClasses.Movie
 import kotlin.collections.ArrayList
 
 
 class MatchFragment : Fragment(), View.OnClickListener {
 
-    private val TAG = "MatchFragment"
+    private var TAG = "SecondMatchFragment"
 
-    private lateinit var secondMatchFragment: Fragment
+    private lateinit var matchFragment: Fragment
 
-    private lateinit var buttonCreate: Button
     private lateinit var buttonViewMembers: Button
     private lateinit var buttonLeave: Button
-    private lateinit var editTextCode1: EditText
-    private lateinit var editTextCode2: EditText
-    private lateinit var editTextCode3: EditText
-    private lateinit var editTextCode4: EditText
+    private lateinit var textViewGroup: TextView
+    private lateinit var textViewNoMatches: TextView
 
     private lateinit var uid: String
-    private var groupCode: String = ""
-    private var inGroup = false
-    private var isInGroup = false
+    private lateinit var movieId: String
+    private lateinit var movie: Movie
+    private var colSize = 0
+    private var matchPercentage: Double = 0.0
+    private lateinit var groupCode: String
+    private var groupSize: Int = 0
+
+    private var matchArrayList: ArrayList<Match> = arrayListOf()
+    private lateinit var adapter: MatchAdapter
+    private lateinit var matchRecyclerView: RecyclerView
+    private lateinit var linearLayoutManager: LinearLayoutManager
+
     var auth: FirebaseAuth = Firebase.auth
     val db = Firebase.firestore
 
@@ -50,129 +58,205 @@ class MatchFragment : Fragment(), View.OnClickListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_match, container, false)
-
-        //Components from fragment_match layout
-        buttonCreate = root.findViewById(R.id.button_create_group)
-        editTextCode1 = root.findViewById(R.id.edit)
-        editTextCode2 = root.findViewById(R.id.edit1)
-        editTextCode3 = root.findViewById(R.id.edit2)
-        editTextCode4 = root.findViewById(R.id.edit3)
-
-        secondMatchFragment = SecondMatchFragment()
-
-        //initialize uid
-        uid = auth.currentUser.uid
+        val root = inflater.inflate(R.layout.fragment_match2, container, false)
+        //Components from fragment_match2 layout
+        buttonViewMembers = root.findViewById(R.id.button_view_members)
+        buttonLeave = root.findViewById(R.id.button_leave_group)
+        textViewGroup = root.findViewById(R.id.textView_current_group_code)
+        textViewNoMatches = root.findViewById(R.id.textView_no_matches)
+        matchRecyclerView = root.findViewById(R.id.recyclerView_matches)
 
         //Click listeners, makes onClick methods possible
-        buttonCreate.setOnClickListener(this)
+        buttonViewMembers.setOnClickListener(this)
+        buttonLeave.setOnClickListener(this)
 
-        addListenerEdit(editTextCode1, editTextCode2, editTextCode1)
-        addListenerEdit(editTextCode2, editTextCode3, editTextCode1)
-        addListenerEdit(editTextCode3, editTextCode4, editTextCode2)
-        editTextCode4.setOnKeyListener { _, keyCode, event ->
-            if (event.action == KeyEvent.ACTION_DOWN && keyCode == 67) {
-                openSoftKeyboard(editTextCode3)
-            }
-            false
-        }
-        editTextCode4.addTextChangedListener {
-            if (!editTextCode1.text.isNullOrEmpty() && !editTextCode2.text.isNullOrEmpty() && !editTextCode3.text.isNullOrEmpty() && !editTextCode4.text.isNullOrEmpty()) {
-                val sb = StringBuilder()
-                sb.append(editTextCode1.text.toString())
-                    .append(editTextCode2.text.toString())
-                    .append(editTextCode3.text.toString())
-                    .append(editTextCode4.text.toString())
-                Log.i(TAG, groupCode)
-                groupCode = sb.toString()
-                joinGroup(groupCode)
-            } else if (editTextCode4.text.isEmpty()) {
-                openSoftKeyboard(editTextCode3)
-            } else {
-                groupCode = ""
-            }
-        }
+
         return root
-
     }
 
-    private fun addListenerEdit(editText: EditText, editText2: EditText, editTextPrev: EditText) {
-        editText.addTextChangedListener {
-            if (editText.text.length == 1) {
-                openSoftKeyboard(editText2)
-            } else if (editText.text.isEmpty()) {
-                openSoftKeyboard(editTextPrev)
+    override fun onResume() {
+        matchArrayList = arrayListOf()
+        getGroupCode()
+        super.onResume()
+    }
+
+    private fun getSwipes() {
+
+        val colRef = db.collection("rooms")
+            .document(groupCode)
+            .collection("swipes")
+
+        //get swipes collection
+        colRef
+            .get()
+            .addOnSuccessListener { result ->
+                if (result.isEmpty) {
+                    textViewNoMatches.text = getString(R.string.nomatches)
+                } else {
+                    var superLikes: ArrayList<String>
+                    var likes: ArrayList<String>
+                    var notTodays: ArrayList<String>
+                    var nevers: ArrayList<String>
+                    colSize = result.size()
+                    for (document in result) {
+                        movieId = document.id
+
+                        superLikes = if (document.get("Super like") != null) {
+                            document.get("Super like") as ArrayList<String>
+                        } else {
+                            arrayListOf()
+                        }
+                        likes = if (document.get("Like") != null) {
+                            document.get("Like") as ArrayList<String>
+                        } else {
+                            arrayListOf()
+                        }
+                        notTodays = if (document.get("Not today") != null) {
+                            document.get("Not today") as ArrayList<String>
+                        } else {
+                            arrayListOf()
+                        }
+                        nevers = if (document.get("Never") != null) {
+                            document.get("Never") as ArrayList<String>
+                        } else {
+                            arrayListOf()
+                        }
+
+                        val superLikesDouble = superLikes.size.toDouble()
+                        val likesDouble = likes.size.toDouble()
+                        val notTodayDouble = notTodays.size
+                        val neverDouble = nevers.size.toDouble()
+
+                        var tempGroupSize = groupSize + superLikesDouble.toInt() + neverDouble.toInt()
+                        matchPercentage = (2*superLikesDouble+likesDouble)*100/tempGroupSize
+
+                        val match = Match(movieId,"",matchPercentage.toString(), "")
+                        matchArrayList.add(match)
+
+                        //Sort of bad previous solution to calculating match percentage (could go under 0 and over 100)
+//                        var matchPercentage = (superLikesDouble+superLikesDouble/groupSize+likesDouble-neverDouble)*100/groupSize
+//                        if (matchPercentage < 0) {
+//                            matchPercentage = 0.0
+//                        } else if (matchPercentage > 100) {
+//                            matchPercentage = 100.0
+//                        }
+
+                        Log.i(TAG, "MovieID: $movieId")
+                        Log.i(TAG, "Super: $superLikesDouble")
+                        Log.i(TAG, "Like: $likesDouble")
+                        Log.i(TAG, "Not: $notTodayDouble")
+                        Log.i(TAG, "Never: $neverDouble")
+                        Log.i(TAG, "match percentage: $matchPercentage")
+                    }
+                    setMovieTitles()
+                }
+            }.addOnFailureListener { exception ->
+                Log.d(TAG, "get failed with ", exception)
             }
-        }
-        editText.setOnKeyListener { _, keyCode, event ->
-            if (event.action == KeyEvent.ACTION_DOWN && keyCode == 67) {
-                openSoftKeyboard(editTextPrev)
-            }
-            false
+    }
+
+    private fun setMovieTitles() {
+        for (match in matchArrayList){
+            getMovieFromId(match.movieId!!.toInt())
         }
     }
 
-    private fun deleteSharedPreferencesList() {
+    private fun viewMembers() {
+
+        val docRef = db.collection("rooms").document(groupCode)
+        docRef.get()
+            .addOnCompleteListener { task ->
+
+                val document = task.result
+                val userIds: ArrayList<String> = document?.get("users") as ArrayList<String>
+                val users = Array(userIds.size){""}
+                Log.i(TAG, userIds.toString())
+
+                var n = 0
+                for (userId in userIds) {
+                    db.collection("users").document(userId)
+                        .get()
+                        .addOnCompleteListener { task2 ->
+                            val document2 = task2.result
+                            users[n] = document2?.data!!["name"].toString()
+                            n++
+                            if (task2.isSuccessful) {
+                                alertDialog(users)
+                            }
+                        }
+                }
+            }
+    }
+
+    private fun alertDialog(array: Array<String>){
+        context?.let {
+            MaterialAlertDialogBuilder(it)
+                .setTitle(resources.getString(R.string.viewmembers))
+                .setItems(array) { dialog, which ->
+                }
+                .setNeutralButton(resources.getString(R.string.alertcancel)) { dialog, which ->
+                }
+                .show()
+        }
+    }
+
+    private fun leaveGroup() {
+
+        matchFragment = CreateGroupFragment()
+        val docRef = db.collection("rooms").document(groupCode)
+        docRef.get()
+            .addOnSuccessListener { document ->
+                var array: ArrayList<String> = document.get("users") as ArrayList<String>
+                if (array.size == 1) {
+                    //Delete group if you are the last group member
+                    docRef.delete()
+                        .addOnSuccessListener {
+                            deleteSharedPreferencesList(requireContext())
+                            replaceFragment(matchFragment)
+                            Log.d(TAG, "DocumentSnapshot successfully deleted!")
+                        }
+                        .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
+                } else {
+                    deleteSharedPreferencesList(requireContext())
+                    // remove user from group
+                    val updates = hashMapOf<String, Any>(
+                        "users" to FieldValue.arrayRemove(uid)
+                    )
+                    docRef.update(updates).addOnCompleteListener {
+                    }
+                        .addOnFailureListener { exception ->
+                            Log.d(TAG, "get failed with ", exception)
+                        }
+                    replaceFragment(matchFragment)
+                }
+            }.addOnFailureListener { e ->
+                Log.i(TAG, e.toString())
+            }
+        //TODO Delete user's swipes from the group in firestore
+    }
+
+    private fun deleteSharedPreferencesList(context: Context) {
         val mPrefs: SharedPreferences =
-            activity!!.getSharedPreferences("savedMovieList", Context.MODE_PRIVATE)
+            context.getSharedPreferences("savedMovieList", Context.MODE_PRIVATE)
         val prefsEditor = mPrefs.edit()
         prefsEditor.clear()
         prefsEditor.commit()
     }
 
-    override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
-        when (view) {
-            buttonCreate -> {
-                createGroup()
-                replaceFragment(secondMatchFragment)
+    private fun getGroupCode() {
+        uid = auth.currentUser.uid
+        db.collection("rooms").whereArrayContains("users", uid).get()
+            .addOnSuccessListener { document ->
+                groupCode = document.documents[0].id
+                var groupArrayList: ArrayList<String> = arrayListOf<String>()
+                groupArrayList = document.documents[0].get("users") as ArrayList<String>
+                groupSize = groupArrayList.size
+                getSwipes()
+                Log.i(TAG, "group code: $groupCode")
+                textViewGroup.text = "Group code: $groupCode"
             }
-        }
-    }
-
-    private fun openSoftKeyboard(editText: EditText) {
-        editText.requestFocus()
-        val inputMethodManager =
-            context?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
-    }
-
-    private fun joinGroup(code: String) {
-        if (code.isEmpty()) {
-            //      inputAgain(editTextCode, "Please put in a group code")
-        } else {
-            val docRef = db.collection("rooms").document(code)
-            val updates = hashMapOf<String, Any>(
-                "users" to FieldValue.arrayUnion(uid)
-            )
-            docRef.update(updates).addOnSuccessListener {
-                deleteSharedPreferencesList()
-                replaceFragment(secondMatchFragment)
-            }.addOnFailureListener {
-                toast("Group $code does not exist")
-                editTextCode1.text.clear()
-                editTextCode2.text.clear()
-                editTextCode3.text.clear()
-                editTextCode4.text.clear()
-                openSoftKeyboard(editTextCode1)
-            }
-        }
-    }
-
-    private fun createGroup() {
-
-        val userIdList: ArrayList<String> = ArrayList()
-
-        val groupCode = generateGroupId()
-
-        userIdList.add(uid)
-
-        val group = Group(userIdList)
-
-        db.collection("rooms")
-            .document(groupCode).set(group)
-            .addOnSuccessListener {
-                deleteSharedPreferencesList()
-                Log.d(TAG, "DocumentSnapshot added with ID: $groupCode")
+            .addOnFailureListener { exception ->
+                Log.d(TAG, "get failed with ", exception)
             }
     }
 
@@ -187,4 +271,45 @@ class MatchFragment : Fragment(), View.OnClickListener {
         }
     }
 
+    override fun onClick(v: View?) {
+        when (v) {
+            buttonViewMembers -> viewMembers()
+            buttonLeave -> leaveGroup()
+        }
+    }
+
+    private fun getMovieFromId(movieId: Int) {
+        MoviesRepository.getMovieDetails(movieId,
+            onSuccess = ::onMovieFetched,
+            onError = ::onError
+        )
+    }
+
+    private fun onMovieFetched(movie: Movie) { //Used in getPopularMovies. Fetch data if success
+        Log.d(TAG, "Movie: $movie")
+        Log.i(TAG, "Movie: ${movie.id} and ${movie.title}")
+        val index = matchArrayList.indexOfFirst{
+            it.movieId == movie.id.toString()
+        }
+        matchArrayList[index].title = movie.title
+        matchArrayList[index].posterPath = movie.posterPath
+        colSize--
+        if (colSize == 0) {
+            setAdapter(matchArrayList)
+        }
+    }
+
+    private fun setAdapter(matchArrayList: ArrayList<Match>) {
+        var sortedList = matchArrayList.sortedWith(compareBy { it.matchPercentage }).reversed()
+
+        //Making the recyclerview adapter thing
+        linearLayoutManager = LinearLayoutManager(context)
+        matchRecyclerView.layoutManager = linearLayoutManager
+        adapter = MatchAdapter(sortedList as MutableList<Match>)
+        matchRecyclerView.adapter = adapter
+    }
+
+    private fun onError() { //Used in getPopularMovies
+        toast("Error fetching movie")
+    }
 }

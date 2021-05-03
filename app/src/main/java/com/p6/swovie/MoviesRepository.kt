@@ -24,13 +24,13 @@ object MoviesRepository {
 
 
     fun getPopularMovies(page: Int = 1, onSuccess: (movies: List<Movie>) -> Unit, onError: () -> Unit) {
-        api.getPopularMovies(page = page).enqueue(object : Callback<GetMoviesResponse> {
+        api.getPopularMovies(page = page).enqueue(object : Callback<MoviesList> {
                     override fun onResponse(
-                            call: Call<GetMoviesResponse>,
-                            response: Response<GetMoviesResponse>
+                        call: Call<MoviesList>,
+                        list: Response<MoviesList>
                     ) {
-                        if (response.isSuccessful) {
-                            val responseBody = response.body()
+                        if (list.isSuccessful) {
+                            val responseBody = list.body()
 
                             if (responseBody != null) {
                                 onSuccess.invoke(responseBody.movies)
@@ -42,20 +42,20 @@ object MoviesRepository {
                         }
                     }
 
-                    override fun onFailure(call: Call<GetMoviesResponse>, t: Throwable) {
+                    override fun onFailure(call: Call<MoviesList>, t: Throwable) {
                         onError.invoke()
                     }
                 })
     }
 
     fun getSearchedMovies(query: String, page: Int, onSuccess: (movies: List<Movie>) -> Unit, onError: () -> Unit) {
-        api.getMoviesList(query = query, page = page).enqueue(object : Callback<GetMoviesResponse> {
+        api.getMoviesList(query = query, page = page).enqueue(object : Callback<MoviesList> {
             override fun onResponse(
-                call: Call<GetMoviesResponse>,
-                response: Response<GetMoviesResponse>
+                call: Call<MoviesList>,
+                list: Response<MoviesList>
             ) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
+                if (list.isSuccessful) {
+                    val responseBody = list.body()
 
                     if (responseBody != null) {
                         onSuccess.invoke(responseBody.movies)
@@ -67,7 +67,7 @@ object MoviesRepository {
                 }
             }
 
-            override fun onFailure(call: Call<GetMoviesResponse>, t: Throwable) {
+            override fun onFailure(call: Call<MoviesList>, t: Throwable) {
                 onError.invoke()
             }
         })

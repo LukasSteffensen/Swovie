@@ -16,8 +16,8 @@ class MainActivity : AppCompatActivity() {
     private val TAG: String = "MainActivity"
 
     private val movieFragment = MovieFragment()
-    private val matchFragment = MatchFragment()
-    private val secondMatchFragment = SecondMatchFragment()
+    private val matchFragment = CreateGroupFragment()
+    private val secondMatchFragment = MatchFragment()
     private val searchFragment = SearchFragment()
     private val accountFragment = AccountFragment()
     private var isInGroup: Boolean = false

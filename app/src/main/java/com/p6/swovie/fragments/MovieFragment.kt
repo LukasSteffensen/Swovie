@@ -130,8 +130,8 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
 
         buttonMatches.isEnabled = true // If user in group, Matches button will be enabled
 
-        matchFragment = MatchFragment()
-        secondMatchFragment = SecondMatchFragment()
+        matchFragment = CreateGroupFragment()
+        secondMatchFragment = MatchFragment()
 
         adapter = CardStackAdapter(movieList)
         cardStackView.layoutManager = manager

@@ -22,7 +22,7 @@ interface Api {
     fun getPopularMovies(
             @Query("api_key") apiKey: String = "9870f62e69820872d263749cf1055bc1",
             @Query("page") page: Int
-    ): Call<GetMoviesResponse>
+    ): Call<MoviesList>
 
     @GET(MOVIE_DETAILS)
     fun getMovieDetails(@Path(PARAM_MOVIE_ID) movieId: Int,
@@ -36,5 +36,5 @@ interface Api {
         @Query("query") query: String?,
         @Query("api_key") apiKey: String = "9870f62e69820872d263749cf1055bc1",
         @Query("page") page: Int?
-    ): Call<GetMoviesResponse>
+    ): Call<MoviesList>
 }
