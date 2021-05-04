@@ -206,13 +206,37 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
 
                 val document = task.result
 
-                var likes: ArrayList<String> = arrayListOf("")
+                var superlikes: ArrayList<String>
+                var likes: ArrayList<String>
+                var nottodays: ArrayList<String>
+                var nevers: ArrayList<String>
 
-                if (document != null) {
-                    likes = document.get("Like") as ArrayList<String>
+                superlikes = if (document?.get("Super like") != null) {
+                    document.get("Super like") as ArrayList<String>
+                } else {
+                    arrayListOf()
+                }
+                likes = if (document?.get("Like") != null) {
+                    document.get("Like") as ArrayList<String>
+                } else {
+                    arrayListOf()
+                }
+                nottodays = if (document?.get("Not today") != null) {
+                    document.get("Not today") as ArrayList<String>
+                } else {
+                    arrayListOf()
+                }
+                nevers = if (document?.get("Never") != null) {
+                    document.get("Never") as ArrayList<String>
+                } else {
+                    arrayListOf()
                 }
 
-                Log.i(TAG, likes.toString())
+
+                //likes = document?.get("Like") as ArrayList<String>
+                //superlikes = document.get("Super Like") as ArrayList<String>
+                //nottodays = document.get("Not Today") as ArrayList<String>
+                //nevers = document.get("Never") as ArrayList<String>
 
             val users = Array(likes.size) { "" }
             var n = 0
