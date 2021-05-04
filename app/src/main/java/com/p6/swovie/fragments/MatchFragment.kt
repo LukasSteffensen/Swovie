@@ -26,8 +26,7 @@ import com.p6.swovie.dataClasses.Match
 import com.p6.swovie.dataClasses.Movie
 import kotlin.collections.ArrayList
 
-
-class MatchFragment : Fragment(), View.OnClickListener {
+class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickListener {
 
     private var TAG = "MatchFragment"
 
@@ -72,6 +71,11 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
 
         return root
+    }
+
+    override fun onViewSwipesClick(match: Match)
+    {
+        toast("Hey! Implement me!")
     }
 
     override fun onResume() {
@@ -161,6 +165,33 @@ class MatchFragment : Fragment(), View.OnClickListener {
         }
     }
 
+    private fun viewSwipes() {
+
+        val docRef = db.collection("groups").document(groupCode)
+        docRef.get()
+            .addOnCompleteListener { task ->
+
+                val document = task.result
+                val userIds: ArrayList<String> = document?.get("users") as ArrayList<String>
+                val users = Array(userIds.size){""}
+                Log.i(TAG, userIds.toString())
+
+                var n = 0
+                for (userId in userIds) {
+                    db.collection("users").document(userId)
+                        .get()
+                        .addOnCompleteListener { task2 ->
+                            val document2 = task2.result
+                            users[n] = document2?.data!!["name"].toString()
+                            n++
+                            if (task2.isSuccessful) {
+                                alertDialog(users)
+                            }
+                        }
+                }
+            }
+    }
+
     private fun viewMembers() {
 
         val docRef = db.collection("groups").document(groupCode)
@@ -194,11 +225,24 @@ class MatchFragment : Fragment(), View.OnClickListener {
                 .setTitle(resources.getString(R.string.viewmembers))
                 .setItems(array) { dialog, which ->
                 }
-                .setNeutralButton(resources.getString(R.string.alertcancel)) { dialog, which ->
+                .setNeutralButton(resources.getString(R.string.close)) { dialog, which ->
                 }
                 .show()
         }
     }
+
+    private fun swipesDialog(array: Array<String>){
+        context?.let {
+            MaterialAlertDialogBuilder(it)
+                .setTitle(resources.getString(R.string.viewswipes))
+                .setItems(array) { dialog, which ->
+                }
+                .setNeutralButton(resources.getString(R.string.close)) { dialog, which ->
+                }
+                .show()
+        }
+    }
+
 
     private fun leaveGroup() {
 
@@ -307,7 +351,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
         //Making the recyclerview adapter thing
         linearLayoutManager = LinearLayoutManager(context)
         matchRecyclerView.layoutManager = linearLayoutManager
-        adapter = MatchAdapter(sortedList as MutableList<Match>)
+        adapter = MatchAdapter(sortedList as MutableList<Match>, this)
         matchRecyclerView.adapter = adapter
     }
 

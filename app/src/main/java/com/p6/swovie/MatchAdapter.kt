@@ -3,6 +3,7 @@ package com.p6.swovie
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -11,7 +12,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.p6.swovie.dataClasses.Match
 
-class MatchAdapter(private val matches: MutableList<Match>) : RecyclerView.Adapter<MatchAdapter.MatchViewHolder>() {
+class MatchAdapter(private val matches: MutableList<Match>, private val itemClickListener: OnClickListener) : RecyclerView.Adapter<MatchAdapter.MatchViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MatchViewHolder {
         val view =
@@ -25,24 +26,13 @@ class MatchAdapter(private val matches: MutableList<Match>) : RecyclerView.Adapt
         holder.textViewPercentage.text =
             "%.2f".format(matches[position].matchPercentage?.toDouble())
 
-        holder.buttonViewSwipes.setOnClickListener {
-            listener?.onViewButtonClick()
-        }
+        val match = matches[position]
+        holder.bind(match, itemClickListener)
 
         Glide.with(holder.itemView)
             .load("https://image.tmdb.org/t/p/w342${matches[position].posterPath}")
             .transform(CenterCrop())
             .into(holder.imageView)
-    }
-
-    private var listener: OnClickListener? = null
-
-    fun setListener(listener: OnClickListener) {
-        this.listener = listener
-    }
-
-    interface OnClickListener {
-        fun onViewButtonClick()
     }
 
     override fun getItemCount(): Int {
@@ -56,5 +46,17 @@ class MatchAdapter(private val matches: MutableList<Match>) : RecyclerView.Adapt
         val imageView: ImageView = matchView.findViewById(R.id.image_view)
         val buttonViewSwipes: Button = matchView.findViewById(R.id.button_view_swipes)
 
+        fun bind(match: Match, clickListener: OnClickListener) {
+            buttonViewSwipes.setOnClickListener {
+                clickListener.onViewSwipesClick(match)
+            }
+        }
+
     }
+
+    interface OnClickListener {
+        fun onViewSwipesClick(match: Match)
+    }
+
 }
+

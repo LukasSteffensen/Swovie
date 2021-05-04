@@ -60,6 +60,7 @@
     <string name="alertyes">Yes</string>
     <string name="alertcancel">Cancel</string>
     <string name="apply">Apply</string>
+    <string name="close">Close</string>
 
 
     <!-- Genre filters -->
