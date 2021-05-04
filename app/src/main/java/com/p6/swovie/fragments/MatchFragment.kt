@@ -28,7 +28,7 @@ import com.p6.swovie.dataClasses.Movie
 import kotlin.collections.ArrayList
 
 
-class MatchFragment : Fragment(), View.OnClickListener {
+class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickListener {
 
     private var TAG = "MatchFragment"
 
@@ -82,6 +82,10 @@ class MatchFragment : Fragment(), View.OnClickListener {
     override fun onResume() {
         matchArrayList = arrayListOf()
         super.onResume()
+    }
+
+    override fun onViewSwipesClick(match: Match) {
+        viewSwipes(match)
     }
 
     private fun getSwipes() {
@@ -192,10 +196,57 @@ class MatchFragment : Fragment(), View.OnClickListener {
             }
     }
 
+    private fun viewSwipes(match: Match) {
+
+        movieId = match.movieId.toString()
+
+        val docRef = db.collection("groups").document(groupCode).collection("swipes").document(movieId)
+        docRef.get()
+            .addOnCompleteListener { task ->
+
+                val document = task.result
+
+                var likes: ArrayList<String> = arrayListOf("")
+
+                if (document != null) {
+                    likes = document.get("Like") as ArrayList<String>
+                }
+
+                Log.i(TAG, likes.toString())
+
+            val users = Array(likes.size) { "" }
+            var n = 0
+                for (user in likes) {
+                    db.collection("users").document(user)
+                        .get()
+                        .addOnCompleteListener { task2 ->
+                            val document2 = task2.result
+                            users[n] = document2?.data!!["name"].toString()
+                            n++
+                            if (task2.isSuccessful) {
+                                swipesDialog(users)
+                            }
+                        }
+                }
+        }
+    }
+
     private fun alertDialog(array: Array<String>){
         context?.let {
             MaterialAlertDialogBuilder(it)
                 .setTitle(resources.getString(R.string.viewmembers))
+                .setItems(array) { _, _ ->
+                }
+                .setNeutralButton("Close") { _, _ ->
+                }
+                .show()
+        }
+    }
+
+    private fun swipesDialog(array: Array<String>){
+        context?.let {
+            MaterialAlertDialogBuilder(it)
+                .setTitle(resources.getString(R.string.viewswipes))
                 .setItems(array) { _, _ ->
                 }
                 .setNeutralButton("Close") { _, _ ->
@@ -331,7 +382,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
         //Making the recyclerview adapter thing
         linearLayoutManager = LinearLayoutManager(context)
         matchRecyclerView.layoutManager = linearLayoutManager
-        adapter = MatchAdapter(sortedList as MutableList<Match>)
+        adapter = MatchAdapter(sortedList as MutableList<Match>, this)
         matchRecyclerView.adapter = adapter
     }
 
