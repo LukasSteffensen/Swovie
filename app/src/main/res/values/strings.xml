@@ -82,4 +82,6 @@
     <string name="genre16">TV Movie</string>
     <string name="genre17">War</string>
     <string name="genre18">Western</string>
+    <string name="noSwipeString">You are not in a group. Join or create a group to start swiping!</string>
+    <string name="joinOrCreateGroup">Join/Create Group</string>
 </resources>
