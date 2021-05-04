@@ -73,9 +73,12 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_movie, container, false)
 
+        //initialize uid
+        uid = auth.currentUser.uid
+
         //set isInGroup boolean
         if (auth.currentUser != null) {
-            db.collection("groups").whereArrayContains("users", auth.currentUser.uid).get()
+            db.collection("groups").whereArrayContains("users", uid).get()
                 .addOnSuccessListener { document ->
                     isInGroup = !document.isEmpty
                     Log.i(TAG, "isInGroup is True")
@@ -85,11 +88,9 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
                 }
         }
 
-        //initialize uid
-        uid = auth.currentUser.uid
 
         //get group code
-        db.collection("groups").whereArrayContains("users", auth.currentUser.uid).get()
+        db.collection("groups").whereArrayContains("users", uid).get()
             .addOnSuccessListener { document ->
                 if (!document.isEmpty) {
                     groupCode = document.documents[0].id
