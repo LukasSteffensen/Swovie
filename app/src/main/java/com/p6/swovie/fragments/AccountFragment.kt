@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
@@ -26,10 +27,14 @@ class AccountFragment : Fragment(), View.OnClickListener {
 
     private val JSON_URL_LOGO = "https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg"
     private lateinit var imageViewLogo: ImageView
+    private lateinit var textViewName: TextView
     private lateinit var buttonResetSwipes: Button
     private lateinit var buttonResetPassword: Button
     private lateinit var buttonLogout: Button
 
+    private var name = ""
+
+    val db = Firebase.firestore
     private lateinit var uid: String
 
     var auth: FirebaseAuth = Firebase.auth
@@ -45,6 +50,7 @@ class AccountFragment : Fragment(), View.OnClickListener {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_account, container, false)
 
+        textViewName = root.findViewById(R.id.textView_username)
         imageViewLogo = root.findViewById(R.id.imageView_logo)
 //        buttonResetSwipes = root.findViewById(R.id.button_reset_swipes)
         buttonResetPassword = root.findViewById(R.id.button_reset_password)
@@ -60,7 +66,16 @@ class AccountFragment : Fragment(), View.OnClickListener {
 
         uid = auth.currentUser.uid
 
+        getUsername()
+
         return root
+    }
+
+    private fun getUsername() {
+        db.collection("users").document(uid).get().addOnSuccessListener { result ->
+            name = result.get("name").toString()
+            textViewName.text = name
+        }
     }
 
     override fun onClick(view: View?) { // All OnClick buttons, with strings depending on button
