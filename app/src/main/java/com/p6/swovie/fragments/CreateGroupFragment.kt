@@ -160,14 +160,14 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
 
         val userIdList: ArrayList<String> = ArrayList()
 
-        val groupCode = generateGroupId()
+        val generatedGroupCode = generateGroupId()
 
         userIdList.add(uid)
 
         val group = Group(userIdList)
 
         db.collection("groups")
-            .document(groupCode).set(group)
+            .document(generatedGroupCode).set(group)
             .addOnSuccessListener {
                 //deleteSharedPreferencesList()
                 Log.d(TAG, "DocumentSnapshot added with ID: $groupCode")
