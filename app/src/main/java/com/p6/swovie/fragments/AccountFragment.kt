@@ -46,7 +46,7 @@ class AccountFragment : Fragment(), View.OnClickListener {
         val root = inflater.inflate(R.layout.fragment_account, container, false)
 
         imageViewLogo = root.findViewById(R.id.imageView_logo)
-        buttonResetSwipes = root.findViewById(R.id.button_reset_swipes)
+//        buttonResetSwipes = root.findViewById(R.id.button_reset_swipes)
         buttonResetPassword = root.findViewById(R.id.button_reset_password)
         buttonLogout = root.findViewById(R.id.button_logout)
 
@@ -54,7 +54,7 @@ class AccountFragment : Fragment(), View.OnClickListener {
                 .load(JSON_URL_LOGO)
                 .into(imageViewLogo)
 
-        buttonResetSwipes.setOnClickListener(this)
+//        buttonResetSwipes.setOnClickListener(this)
         buttonResetPassword.setOnClickListener(this)
         buttonLogout.setOnClickListener(this)
 
@@ -78,7 +78,7 @@ class AccountFragment : Fragment(), View.OnClickListener {
             when (button) { // based on buttons, when pressed yes do the action
                 buttonLogout -> { logOut() }
                 buttonResetPassword -> { resetPassword() }
-                buttonResetSwipes -> { toast("Reset all swipes clicked yes") }
+//                buttonResetSwipes -> { toast("Reset all swipes clicked yes") }
                 else -> { toast("Error occurred") }
             }
         }
