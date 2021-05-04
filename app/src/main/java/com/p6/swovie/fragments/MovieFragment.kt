@@ -242,7 +242,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
             movieList.addAll(movies)
             updateAdapter(movieList)
         }
-        if (swipedMoviesList.size > movieList.size) {
+        if (swipedMoviesList.size >= movieList.size) {
             loadMoreMovies()
         } else {
             movieList.removeAll(swipedMoviesList)
@@ -251,7 +251,6 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
             adapter.setList(movieList)
             adapter.notifyDataSetChanged()
         }
-
         popularMoviesPage++
     }
 

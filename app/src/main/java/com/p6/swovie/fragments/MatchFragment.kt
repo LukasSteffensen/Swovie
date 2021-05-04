@@ -19,6 +19,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.p6.swovie.MainActivity
 import com.p6.swovie.MatchAdapter
 import com.p6.swovie.MoviesRepository
 import com.p6.swovie.R
@@ -30,8 +31,6 @@ import kotlin.collections.ArrayList
 class MatchFragment : Fragment(), View.OnClickListener {
 
     private var TAG = "MatchFragment"
-
-    private lateinit var matchFragment: Fragment
 
     private lateinit var buttonViewMembers: Button
     private lateinit var buttonLeave: Button
@@ -74,12 +73,14 @@ class MatchFragment : Fragment(), View.OnClickListener {
         buttonViewMembers.setOnClickListener(this)
         buttonLeave.setOnClickListener(this)
 
+        getGroupCode()
+
+
         return root
     }
 
     override fun onResume() {
         matchArrayList = arrayListOf()
-        getGroupCode()
         super.onResume()
     }
 
@@ -205,16 +206,16 @@ class MatchFragment : Fragment(), View.OnClickListener {
 
     private fun leaveGroup() {
 
-        matchFragment = CreateGroupFragment()
         val docRef = db.collection("groups").document(groupCode)
         docRef.get()
             .addOnSuccessListener { document ->
                 var array: ArrayList<String> = document.get("users") as ArrayList<String>
                 if (array.size == 1) {
+                    deleteSwipesAndSharedPref()
                     //Delete group if you are the last group member
                     docRef.delete()
                         .addOnSuccessListener {
-                            replaceFragment(matchFragment)
+                            replaceFragment(CreateGroupFragment())
                             Log.d(TAG, "DocumentSnapshot successfully deleted!")
                         }
                         .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
@@ -228,11 +229,16 @@ class MatchFragment : Fragment(), View.OnClickListener {
                         .addOnFailureListener { exception ->
                             Log.d(TAG, "get failed with ", exception)
                         }
-                    replaceFragment(matchFragment)
+                    deleteSwipesAndSharedPref()
+                    replaceFragment(CreateGroupFragment())
                 }
             }.addOnFailureListener { e ->
                 Log.i(TAG, e.toString())
             }
+    }
+
+    private fun deleteSwipesAndSharedPref() {
+        MainActivity.isInGroup = false
         deleteSharedPreferencesList(requireContext())
         deleteSwipesFromGroup()
     }
@@ -263,13 +269,15 @@ class MatchFragment : Fragment(), View.OnClickListener {
     private fun getGroupCode() {
         db.collection("groups").whereArrayContains("users", uid).get()
             .addOnSuccessListener { document ->
-                groupCode = document.documents[0].id
-                var groupArrayList: ArrayList<String> = arrayListOf<String>()
-                groupArrayList = document.documents[0].get("users") as ArrayList<String>
-                groupSize = groupArrayList.size
-                getSwipes()
-                Log.i(TAG, "group code: $groupCode")
-                textViewGroup.text = "Group code: $groupCode"
+                if (!document.isEmpty) {
+                    groupCode = document.documents[0].id
+                    var groupArrayList: ArrayList<String> = arrayListOf<String>()
+                    groupArrayList = document.documents[0].get("users") as ArrayList<String>
+                    groupSize = groupArrayList.size
+                    getSwipes()
+                    Log.i(TAG, "group code: $groupCode")
+                    textViewGroup.text = "Group code: $groupCode"
+                }
             }
             .addOnFailureListener { exception ->
                 Log.d(TAG, "get failed with ", exception)

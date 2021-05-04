@@ -44,8 +44,13 @@ class FilterDialogFragment : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    private fun toast(message: String) {
+        Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+    }
+
     private fun changeToFilters() {
         val intent = Intent (this, MainActivity::class.java)
+        toast("Filters coming in an update soon")
         startActivity(intent)
     }
 

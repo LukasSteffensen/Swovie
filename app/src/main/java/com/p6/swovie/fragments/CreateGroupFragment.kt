@@ -17,6 +17,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.p6.swovie.MainActivity
 import com.p6.swovie.R
 import com.p6.swovie.dataClasses.Group
 import com.p6.swovie.dataClasses.generateGroupId
@@ -30,8 +31,6 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
     private lateinit var secondMatchFragment: Fragment
 
     private lateinit var buttonCreate: Button
-    private lateinit var buttonViewMembers: Button
-    private lateinit var buttonLeave: Button
     private lateinit var editTextCode1: EditText
     private lateinit var editTextCode2: EditText
     private lateinit var editTextCode3: EditText
@@ -39,8 +38,6 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
 
     private lateinit var uid: String
     private var groupCode: String = ""
-    private var inGroup = false
-    private var isInGroup = false
     var auth: FirebaseAuth = Firebase.auth
     val db = Firebase.firestore
 
@@ -143,7 +140,7 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
                 "users" to FieldValue.arrayUnion(uid)
             )
             docRef.update(updates).addOnSuccessListener {
-                //deleteSharedPreferencesList()
+                MainActivity.isInGroup = true
                 replaceFragment(secondMatchFragment)
             }.addOnFailureListener {
                 toast("Group $code does not exist")
@@ -160,16 +157,16 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
 
         val userIdList: ArrayList<String> = ArrayList()
 
-        val groupCode = generateGroupId()
+        val generatedGroupCode = generateGroupId()
 
         userIdList.add(uid)
 
         val group = Group(userIdList)
 
         db.collection("groups")
-            .document(groupCode).set(group)
+            .document(generatedGroupCode).set(group)
             .addOnSuccessListener {
-                //deleteSharedPreferencesList()
+                MainActivity.isInGroup = true
                 Log.d(TAG, "DocumentSnapshot added with ID: $groupCode")
             }
     }

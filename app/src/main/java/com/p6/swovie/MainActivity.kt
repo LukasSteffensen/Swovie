@@ -13,18 +13,21 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.p6.swovie.fragments.*
+import java.lang.NullPointerException
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
 
+    companion object DataHolder{
+        var isInGroup: Boolean = false
+    }
+
     private val TAG: String = "MainActivity"
 
-    private var isInGroup: Boolean = false
     private lateinit var bottomNavigation: BottomNavigationView
 
     private var auth: FirebaseAuth = Firebase.auth
     private val db = Firebase.firestore
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
