@@ -59,6 +59,10 @@ class MatchFragment : Fragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_match2, container, false)
+
+        //Initialize uid
+        uid = auth.currentUser.uid
+
         //Components from fragment_match2 layout
         buttonViewMembers = root.findViewById(R.id.button_view_members)
         buttonLeave = root.findViewById(R.id.button_leave_group)
@@ -69,7 +73,6 @@ class MatchFragment : Fragment(), View.OnClickListener {
         //Click listeners, makes onClick methods possible
         buttonViewMembers.setOnClickListener(this)
         buttonLeave.setOnClickListener(this)
-
 
         return root
     }
@@ -232,7 +235,22 @@ class MatchFragment : Fragment(), View.OnClickListener {
             }.addOnFailureListener { e ->
                 Log.i(TAG, e.toString())
             }
-        //TODO Delete user's swipes from the group in firestore
+        deleteSwipesFromGroup()
+    }
+
+    private fun deleteSwipesFromGroup() {
+        val swipesRef = db.collection("groups")
+            .document(groupCode)
+            .collection("swipes")
+        swipesRef.get().addOnSuccessListener { result ->
+            for (document in result) {
+                // Atomically remove a region from the "regions" array field.
+                document.reference.update("Super like", FieldValue.arrayRemove(uid))
+                document.reference.update("Like", FieldValue.arrayRemove(uid))
+                document.reference.update("Not today", FieldValue.arrayRemove(uid))
+                document.reference.update("Never", FieldValue.arrayRemove(uid))
+            }
+        }
     }
 
     private fun deleteSharedPreferencesList(context: Context) {
@@ -244,7 +262,6 @@ class MatchFragment : Fragment(), View.OnClickListener {
     }
 
     private fun getGroupCode() {
-        uid = auth.currentUser.uid
         db.collection("groups").whereArrayContains("users", uid).get()
             .addOnSuccessListener { document ->
                 groupCode = document.documents[0].id
