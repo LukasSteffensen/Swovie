@@ -39,10 +39,10 @@ class MainActivity : AppCompatActivity() {
         if(auth.currentUser != null) {
             db.collection("groups").whereArrayContains("users", auth.currentUser.uid).get()
                 .addOnSuccessListener { document ->
-                    MainActivity.isInGroup = !document.isEmpty
+                    isInGroup = !document.isEmpty
                     bottomNavigation.isClickable = true
                     Log.i(TAG, "isInGroup is True")
-                    if (MainActivity.isInGroup){
+                    if (isInGroup){
                         replaceFragment(MovieFragment())
                     } else {
                         replaceFragment(NoSwipeForUHaHaFragment())
@@ -59,13 +59,13 @@ class MainActivity : AppCompatActivity() {
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         if (item.itemId == R.id.ic_movie){
-            if (MainActivity.isInGroup){
+            if (isInGroup){
                 replaceFragment(MovieFragment())
             } else {
                 replaceFragment(NoSwipeForUHaHaFragment())
             }
         } else if (item.itemId == R.id.ic_match){
-            if(MainActivity.isInGroup){
+            if(isInGroup){
                 replaceFragment(MatchFragment())
             } else {
                 replaceFragment(CreateGroupFragment())
