@@ -59,6 +59,10 @@ class MatchFragment : Fragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_match2, container, false)
+
+        //Initialize uid
+        uid = auth.currentUser.uid
+
         //Components from fragment_match2 layout
         buttonViewMembers = root.findViewById(R.id.button_view_members)
         buttonLeave = root.findViewById(R.id.button_leave_group)
@@ -69,7 +73,6 @@ class MatchFragment : Fragment(), View.OnClickListener {
         //Click listeners, makes onClick methods possible
         buttonViewMembers.setOnClickListener(this)
         buttonLeave.setOnClickListener(this)
-
 
         return root
     }
@@ -192,9 +195,9 @@ class MatchFragment : Fragment(), View.OnClickListener {
         context?.let {
             MaterialAlertDialogBuilder(it)
                 .setTitle(resources.getString(R.string.viewmembers))
-                .setItems(array) { dialog, which ->
+                .setItems(array) { _, _ ->
                 }
-                .setNeutralButton(resources.getString(R.string.alertcancel)) { dialog, which ->
+                .setNeutralButton("Close") { _, _ ->
                 }
                 .show()
         }
@@ -211,13 +214,11 @@ class MatchFragment : Fragment(), View.OnClickListener {
                     //Delete group if you are the last group member
                     docRef.delete()
                         .addOnSuccessListener {
-                            deleteSharedPreferencesList(requireContext())
                             replaceFragment(matchFragment)
                             Log.d(TAG, "DocumentSnapshot successfully deleted!")
                         }
                         .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
                 } else {
-                    deleteSharedPreferencesList(requireContext())
                     // remove user from group
                     val updates = hashMapOf<String, Any>(
                         "users" to FieldValue.arrayRemove(uid)
@@ -232,7 +233,23 @@ class MatchFragment : Fragment(), View.OnClickListener {
             }.addOnFailureListener { e ->
                 Log.i(TAG, e.toString())
             }
-        //TODO Delete user's swipes from the group in firestore
+        deleteSharedPreferencesList(requireContext())
+        deleteSwipesFromGroup()
+    }
+
+    private fun deleteSwipesFromGroup() {
+        val swipesRef = db.collection("groups")
+            .document(groupCode)
+            .collection("swipes")
+        swipesRef.get().addOnSuccessListener { result ->
+            for (document in result) {
+                // Atomically remove a region from the "regions" array field.
+                document.reference.update("Super like", FieldValue.arrayRemove(uid))
+                document.reference.update("Like", FieldValue.arrayRemove(uid))
+                document.reference.update("Not today", FieldValue.arrayRemove(uid))
+                document.reference.update("Never", FieldValue.arrayRemove(uid))
+            }
+        }
     }
 
     private fun deleteSharedPreferencesList(context: Context) {
@@ -244,7 +261,6 @@ class MatchFragment : Fragment(), View.OnClickListener {
     }
 
     private fun getGroupCode() {
-        uid = auth.currentUser.uid
         db.collection("groups").whereArrayContains("users", uid).get()
             .addOnSuccessListener { document ->
                 groupCode = document.documents[0].id

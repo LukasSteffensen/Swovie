@@ -143,7 +143,7 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
                 "users" to FieldValue.arrayUnion(uid)
             )
             docRef.update(updates).addOnSuccessListener {
-                deleteSharedPreferencesList()
+                //deleteSharedPreferencesList()
                 replaceFragment(secondMatchFragment)
             }.addOnFailureListener {
                 toast("Group $code does not exist")
@@ -169,7 +169,7 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
         db.collection("groups")
             .document(groupCode).set(group)
             .addOnSuccessListener {
-                deleteSharedPreferencesList()
+                //deleteSharedPreferencesList()
                 Log.d(TAG, "DocumentSnapshot added with ID: $groupCode")
             }
     }

@@ -30,9 +30,7 @@ class AccountFragment : Fragment(), View.OnClickListener {
     private lateinit var buttonResetPassword: Button
     private lateinit var buttonLogout: Button
 
-    private val db = Firebase.firestore
     private lateinit var uid: String
-    private val groupCode = "DV3L"
 
     var auth: FirebaseAuth = Firebase.auth
 
@@ -67,25 +65,8 @@ class AccountFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(view: View?) { // All OnClick buttons, with strings depending on button
         when (view) {
-            buttonResetSwipes -> //working on leave group stuff here
-                deleteSwipesFromGroup()
             buttonResetPassword -> alert(getString(R.string.resetpassword), getString(R.string.alertpassword), buttonResetPassword)
             buttonLogout -> alert(getString(R.string.logout), getString(R.string.alertlogout), buttonLogout)
-        }
-    }
-
-    private fun deleteSwipesFromGroup() {
-        val swipesRef = db.collection("groups")
-            .document(groupCode)
-            .collection("swipes")
-        swipesRef.get().addOnSuccessListener { result ->
-            for (document in result) {
-                // Atomically remove a region from the "regions" array field.
-                document.reference.update("Super like", FieldValue.arrayRemove(uid))
-                document.reference.update("Like", FieldValue.arrayRemove(uid))
-                document.reference.update("Not today", FieldValue.arrayRemove(uid))
-                document.reference.update("Never", FieldValue.arrayRemove(uid))
-            }
         }
     }
 
