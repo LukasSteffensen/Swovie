@@ -17,11 +17,6 @@ class MainActivity : AppCompatActivity() {
 
     private val TAG: String = "MainActivity"
 
-    private val movieFragment = MovieFragment()
-    private val createGroupFragment = CreateGroupFragment()
-    private val matchFragment = MatchFragment()
-    private val searchFragment = SearchFragment()
-    private val accountFragment = AccountFragment()
     private var isInGroup: Boolean = false
 
     private var auth: FirebaseAuth = Firebase.auth
@@ -31,7 +26,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        replaceFragment(movieFragment)
+        replaceFragment(MovieFragment())
         val bottomNavigation: BottomNavigationView = findViewById(R.id.navigation_bar)
 
         bottomNavigation.isClickable = false
@@ -48,24 +43,23 @@ class MainActivity : AppCompatActivity() {
                 }
         }
 
-
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
     }
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         if (item.itemId == R.id.ic_movie){
-            replaceFragment(movieFragment)
+            replaceFragment(MovieFragment())
         } else if (item.itemId == R.id.ic_match){
             if(isInGroup){
-                replaceFragment(matchFragment)
+                replaceFragment(MatchFragment())
             } else {
-                replaceFragment(createGroupFragment)
+                replaceFragment(CreateGroupFragment())
             }
         } else if (item.itemId == R.id.ic_search){
-            replaceFragment(searchFragment)
+            replaceFragment(SearchFragment())
         } else if (item.itemId == R.id.ic_account){
-            replaceFragment(accountFragment)
+            replaceFragment(AccountFragment())
         }
         true
     }
@@ -81,12 +75,13 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         var fm: FragmentManager = supportFragmentManager
         when {
-            fm.backStackEntryCount > 0 -> {
+            fm.backStackEntryCount > 1 -> {
                 Log.i(TAG, "popping back stack")
                 fm.popBackStack()
             }
-            fm.backStackEntryCount == 0 -> {
+            fm.backStackEntryCount == 1 -> {
                 Log.i(TAG, "Nothing on back stack, closing app")
+                moveTaskToBack(true)
                 exitProcess(-1)
             }
             else -> {
