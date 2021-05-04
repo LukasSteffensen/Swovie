@@ -138,7 +138,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                         var tempGroupSize = groupSize + superLikesDouble.toInt() + neverDouble.toInt()
                         matchPercentage = (2*superLikesDouble+likesDouble)*100/tempGroupSize
 
-                        val match = Match(movieId,"",matchPercentage.toString(), "")
+                        val match = Match(movieId,"",matchPercentage, "")
                         matchArrayList.add(match)
 
                         //Sort of bad previous solution to calculating match percentage (could go under 0 and over 100)
@@ -256,6 +256,8 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
     }
 
     private fun leaveGroup() {
+
+        buttonLeave.isClickable = false
 
         val docRef = db.collection("groups").document(groupCode)
         docRef.get()
