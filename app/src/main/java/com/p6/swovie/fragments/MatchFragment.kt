@@ -195,9 +195,9 @@ class MatchFragment : Fragment(), View.OnClickListener {
         context?.let {
             MaterialAlertDialogBuilder(it)
                 .setTitle(resources.getString(R.string.viewmembers))
-                .setItems(array) { dialog, which ->
+                .setItems(array) { _, _ ->
                 }
-                .setNeutralButton(resources.getString(R.string.alertcancel)) { dialog, which ->
+                .setNeutralButton("Close") { _, _ ->
                 }
                 .show()
         }
@@ -214,13 +214,11 @@ class MatchFragment : Fragment(), View.OnClickListener {
                     //Delete group if you are the last group member
                     docRef.delete()
                         .addOnSuccessListener {
-                            deleteSharedPreferencesList(requireContext())
                             replaceFragment(matchFragment)
                             Log.d(TAG, "DocumentSnapshot successfully deleted!")
                         }
                         .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
                 } else {
-                    deleteSharedPreferencesList(requireContext())
                     // remove user from group
                     val updates = hashMapOf<String, Any>(
                         "users" to FieldValue.arrayRemove(uid)
@@ -235,6 +233,7 @@ class MatchFragment : Fragment(), View.OnClickListener {
             }.addOnFailureListener { e ->
                 Log.i(TAG, e.toString())
             }
+        deleteSharedPreferencesList(requireContext())
         deleteSwipesFromGroup()
     }
 
