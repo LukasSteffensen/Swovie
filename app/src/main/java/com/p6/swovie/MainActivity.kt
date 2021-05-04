@@ -24,12 +24,10 @@ class MainActivity : AppCompatActivity() {
 
     private val TAG: String = "MainActivity"
 
-    var isInGroup: Boolean = false
     private lateinit var bottomNavigation: BottomNavigationView
 
     private var auth: FirebaseAuth = Firebase.auth
     private val db = Firebase.firestore
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,10 +39,10 @@ class MainActivity : AppCompatActivity() {
         if(auth.currentUser != null) {
             db.collection("groups").whereArrayContains("users", auth.currentUser.uid).get()
                 .addOnSuccessListener { document ->
-                    isInGroup = !document.isEmpty
+                    MainActivity.isInGroup = !document.isEmpty
                     bottomNavigation.isClickable = true
                     Log.i(TAG, "isInGroup is True")
-                    if (isInGroup){
+                    if (MainActivity.isInGroup){
                         replaceFragment(MovieFragment())
                     } else {
                         replaceFragment(NoSwipeForUHaHaFragment())
@@ -61,13 +59,13 @@ class MainActivity : AppCompatActivity() {
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         if (item.itemId == R.id.ic_movie){
-            if (isInGroup){
+            if (MainActivity.isInGroup){
                 replaceFragment(MovieFragment())
             } else {
                 replaceFragment(NoSwipeForUHaHaFragment())
             }
         } else if (item.itemId == R.id.ic_match){
-            if(isInGroup){
+            if(MainActivity.isInGroup){
                 replaceFragment(MatchFragment())
             } else {
                 replaceFragment(CreateGroupFragment())
