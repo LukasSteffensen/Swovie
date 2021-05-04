@@ -1,8 +1,10 @@
 package com.p6.swovie
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -18,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private val TAG: String = "MainActivity"
 
     private var isInGroup: Boolean = false
+    private lateinit var bottomNavigation: BottomNavigationView
 
     private var auth: FirebaseAuth = Firebase.auth
     private val db = Firebase.firestore
@@ -26,8 +29,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        replaceFragment(MovieFragment())
-        val bottomNavigation: BottomNavigationView = findViewById(R.id.navigation_bar)
+        bottomNavigation = findViewById(R.id.navigation_bar)
 
         bottomNavigation.isClickable = false
 
@@ -37,6 +39,11 @@ class MainActivity : AppCompatActivity() {
                     isInGroup = !document.isEmpty
                     bottomNavigation.isClickable = true
                     Log.i(TAG, "isInGroup is True")
+                    if (isInGroup){
+                        replaceFragment(MovieFragment())
+                    } else {
+                        replaceFragment(NoSwipeForUHaHaFragment())
+                    }
                 }
                 .addOnFailureListener { exception ->
                     Log.d(TAG, "get failed with ", exception)
@@ -49,7 +56,11 @@ class MainActivity : AppCompatActivity() {
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         if (item.itemId == R.id.ic_movie){
-            replaceFragment(MovieFragment())
+            if (isInGroup){
+                replaceFragment(MovieFragment())
+            } else {
+                replaceFragment(NoSwipeForUHaHaFragment())
+            }
         } else if (item.itemId == R.id.ic_match){
             if(isInGroup){
                 replaceFragment(MatchFragment())

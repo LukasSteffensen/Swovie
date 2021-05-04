@@ -26,7 +26,8 @@ import com.p6.swovie.dataClasses.Match
 import com.p6.swovie.dataClasses.Movie
 import kotlin.collections.ArrayList
 
-class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickListener {
+
+class MatchFragment : Fragment(), View.OnClickListener {
 
     private var TAG = "MatchFragment"
 
@@ -58,6 +59,10 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_match2, container, false)
+
+        //Initialize uid
+        uid = auth.currentUser.uid
+
         //Components from fragment_match2 layout
         buttonViewMembers = root.findViewById(R.id.button_view_members)
         buttonLeave = root.findViewById(R.id.button_leave_group)
@@ -69,13 +74,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         buttonViewMembers.setOnClickListener(this)
         buttonLeave.setOnClickListener(this)
 
-
         return root
-    }
-
-    override fun onViewSwipesClick(match: Match)
-    {
-        toast("Hey! Implement me!")
     }
 
     override fun onResume() {
@@ -165,33 +164,6 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         }
     }
 
-    private fun viewSwipes() {
-
-        val docRef = db.collection("groups").document(groupCode)
-        docRef.get()
-            .addOnCompleteListener { task ->
-
-                val document = task.result
-                val userIds: ArrayList<String> = document?.get("users") as ArrayList<String>
-                val users = Array(userIds.size){""}
-                Log.i(TAG, userIds.toString())
-
-                var n = 0
-                for (userId in userIds) {
-                    db.collection("users").document(userId)
-                        .get()
-                        .addOnCompleteListener { task2 ->
-                            val document2 = task2.result
-                            users[n] = document2?.data!!["name"].toString()
-                            n++
-                            if (task2.isSuccessful) {
-                                alertDialog(users)
-                            }
-                        }
-                }
-            }
-    }
-
     private fun viewMembers() {
 
         val docRef = db.collection("groups").document(groupCode)
@@ -223,26 +195,13 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         context?.let {
             MaterialAlertDialogBuilder(it)
                 .setTitle(resources.getString(R.string.viewmembers))
-                .setItems(array) { dialog, which ->
+                .setItems(array) { _, _ ->
                 }
-                .setNeutralButton(resources.getString(R.string.close)) { dialog, which ->
-                }
-                .show()
-        }
-    }
-
-    private fun swipesDialog(array: Array<String>){
-        context?.let {
-            MaterialAlertDialogBuilder(it)
-                .setTitle(resources.getString(R.string.viewswipes))
-                .setItems(array) { dialog, which ->
-                }
-                .setNeutralButton(resources.getString(R.string.close)) { dialog, which ->
+                .setNeutralButton("Close") { _, _ ->
                 }
                 .show()
         }
     }
-
 
     private fun leaveGroup() {
 
@@ -255,13 +214,11 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                     //Delete group if you are the last group member
                     docRef.delete()
                         .addOnSuccessListener {
-                            deleteSharedPreferencesList(requireContext())
                             replaceFragment(matchFragment)
                             Log.d(TAG, "DocumentSnapshot successfully deleted!")
                         }
                         .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
                 } else {
-                    deleteSharedPreferencesList(requireContext())
                     // remove user from group
                     val updates = hashMapOf<String, Any>(
                         "users" to FieldValue.arrayRemove(uid)
@@ -276,7 +233,23 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
             }.addOnFailureListener { e ->
                 Log.i(TAG, e.toString())
             }
-        //TODO Delete user's swipes from the group in firestore
+        deleteSharedPreferencesList(requireContext())
+        deleteSwipesFromGroup()
+    }
+
+    private fun deleteSwipesFromGroup() {
+        val swipesRef = db.collection("groups")
+            .document(groupCode)
+            .collection("swipes")
+        swipesRef.get().addOnSuccessListener { result ->
+            for (document in result) {
+                // Atomically remove a region from the "regions" array field.
+                document.reference.update("Super like", FieldValue.arrayRemove(uid))
+                document.reference.update("Like", FieldValue.arrayRemove(uid))
+                document.reference.update("Not today", FieldValue.arrayRemove(uid))
+                document.reference.update("Never", FieldValue.arrayRemove(uid))
+            }
+        }
     }
 
     private fun deleteSharedPreferencesList(context: Context) {
@@ -288,7 +261,6 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
     }
 
     private fun getGroupCode() {
-        uid = auth.currentUser.uid
         db.collection("groups").whereArrayContains("users", uid).get()
             .addOnSuccessListener { document ->
                 groupCode = document.documents[0].id
@@ -351,7 +323,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         //Making the recyclerview adapter thing
         linearLayoutManager = LinearLayoutManager(context)
         matchRecyclerView.layoutManager = linearLayoutManager
-        adapter = MatchAdapter(sortedList as MutableList<Match>, this)
+        adapter = MatchAdapter(sortedList as MutableList<Match>)
         matchRecyclerView.adapter = adapter
     }
 

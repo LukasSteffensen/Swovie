@@ -272,7 +272,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     }
 
     private fun onError() {
-        Toast.makeText(activity, "Error fetching movies", Toast.LENGTH_SHORT).show()
+        toast("Error fetching movies")
     }
 
     private fun populateDetails(extras: Bundle) {
@@ -289,6 +289,11 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
             replace(R.id.fl_wrapper, fragment)
             commit()
         }
+    }
+
+    override fun onPause() {
+        popularMoviesPage = 1
+        super.onPause()
     }
 
     private fun toast(message: String) {
