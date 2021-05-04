@@ -251,7 +251,6 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
             adapter.setList(movieList)
             adapter.notifyDataSetChanged()
         }
-
         popularMoviesPage++
     }
 
