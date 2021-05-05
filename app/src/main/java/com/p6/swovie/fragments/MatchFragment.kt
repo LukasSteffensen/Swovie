@@ -104,6 +104,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
             .addOnSuccessListener { result ->
                 if (result.isEmpty) {
                     textViewNoMatches.text = getString(R.string.nomatches)
+                    progressBar.visibility = View.GONE
                 } else {
                     var superLikes: ArrayList<String>
                     var likes: ArrayList<String>
@@ -239,8 +240,11 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                 val allSwipes = likes + superlikes + nottodays + nevers
                 Log.i(TAG, allSwipes.toString() + " swiped on this movie: " + movieId + " titled: " + match.title.toString())
 
-                val users = Array(allSwipes.size) { "" }
-                var n = 0
+                if (allSwipes.isEmpty()) {
+                    toast("There are no votes on this movie")
+                } else {
+                    val users = Array(allSwipes.size) { "" }
+                    var n = 0
                     for (user in allSwipes) {
                         db.collection("users").document(user)
                             .get()
@@ -250,16 +254,20 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
 
                                 when {
                                     likes.contains(user) -> {
-                                        users[n] = document2?.data!!["name"].toString() + " liked this movie"
+                                        users[n] =
+                                            document2?.data!!["name"].toString() + " liked this movie"
                                     }
                                     superlikes.contains(user) -> {
-                                        users[n] = document2?.data!!["name"].toString() + " super liked this movie"
+                                        users[n] =
+                                            document2?.data!!["name"].toString() + " super liked this movie"
                                     }
                                     nottodays.contains(user) -> {
-                                        users[n] = document2?.data!!["name"].toString() + " is neutral"
+                                        users[n] =
+                                            document2?.data!!["name"].toString() + " is neutral"
                                     }
                                     nevers.contains(user) -> {
-                                        users[n] = document2?.data!!["name"].toString() + " hates this movie"
+                                        users[n] =
+                                            document2?.data!!["name"].toString() + " hates this movie"
                                     }
                                     //TODO User has not swiped this movie maybe?
                                     else -> {
@@ -273,6 +281,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                                 }
                             }
                     }
+                }
         }
     }
 
