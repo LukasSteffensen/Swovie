@@ -81,12 +81,12 @@ class AccountFragment : Fragment(), View.OnClickListener {
     override fun onClick(view: View?) { // All OnClick buttons, with strings depending on button
         when (view) {
             buttonViewInstructions -> openTutorial()
-            buttonResetPassword -> alert(getString(R.string.resetpassword), getString(R.string.alertpassword), buttonResetPassword)
-            buttonLogout -> alert(getString(R.string.logout), getString(R.string.alertlogout), buttonLogout)
+            buttonResetPassword -> alertDialogBuilder(getString(R.string.resetpassword), getString(R.string.alertpassword), buttonResetPassword)
+            buttonLogout -> alertDialogBuilder(getString(R.string.logout), getString(R.string.alertlogout), buttonLogout)
         }
     }
 
-    private fun alert(title: String, message: String, button: Button){ //Making an alert dialog
+    private fun alertDialogBuilder(title: String, message: String, button: Button){ //Making an alert dialog
         val builder = AlertDialog.Builder(activity)
         builder.setTitle(title)
         builder.setMessage(message)
@@ -97,7 +97,7 @@ class AccountFragment : Fragment(), View.OnClickListener {
                 else -> { toast("Error occurred") }
             }
         }
-        builder.setNeutralButton(R.string.alertcancel){dialogInterface , which ->
+        builder.setNeutralButton("no"){ _, _ ->
         }
 
         val alertDialog: AlertDialog = builder.create()
