@@ -245,10 +245,10 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                         .get()
                         .addOnCompleteListener { task2 ->
                             val document2 = task2.result
-                            users[n] = document2?.data!!["name"].toString()
+                            users[n] = document2?.data!!["name"].toString() + " liked this movie"
                             n++
                             if (task2.isSuccessful) {
-                                swipesDialog(users)
+                                swipesDialog(users, match)
                             }
                         }
                 }
@@ -267,10 +267,12 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         }
     }
 
-    private fun swipesDialog(array: Array<String>){
+    private fun swipesDialog(array: Array<String>, match: Match){
+
+        val movieTitle = match.title.toString()
         context?.let {
             MaterialAlertDialogBuilder(it)
-                .setTitle(resources.getString(R.string.viewswipes))
+                .setTitle(movieTitle)
                 .setItems(array) { _, _ ->
                 }
                 .setNeutralButton("Close") { _, _ ->
