@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.p6.swovie.R
 
-class NoSwipeForUHaHaFragment: Fragment(), View.OnClickListener {
+class NoGroupMovieFragment: Fragment(), View.OnClickListener {
 
     private lateinit var buttonCreateJoin: Button
     private lateinit var bottomNavigation: BottomNavigationView
@@ -35,7 +35,6 @@ class NoSwipeForUHaHaFragment: Fragment(), View.OnClickListener {
                 replaceFragment(CreateGroupFragment())
             }
         }
-
     }
 
     private fun replaceFragment(fragment: Fragment){

@@ -29,8 +29,6 @@ class LoginActivity : AppCompatActivity() {
     lateinit var editTextEmail: EditText
     lateinit var editTextPassword: EditText
 
-    private var cancellationSignal: CancellationSignal? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)

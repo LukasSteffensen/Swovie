@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -49,6 +50,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
     private lateinit var adapter: MatchAdapter
     private lateinit var matchRecyclerView: RecyclerView
     private lateinit var linearLayoutManager: LinearLayoutManager
+    private lateinit var progressBar: ProgressBar
 
     var auth: FirebaseAuth = Firebase.auth
     val db = Firebase.firestore
@@ -61,6 +63,8 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
 
         //Initialize uid
         uid = auth.currentUser.uid
+
+        progressBar = root.findViewById(R.id.progress_bar)
 
         //Components from fragment_match2 layout
         buttonViewMembers = root.findViewById(R.id.button_view_members)
@@ -398,6 +402,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         matchArrayList[index].posterPath = movie.posterPath
         colSize--
         if (colSize == 0) {
+            progressBar.visibility = View.GONE
             setAdapter(matchArrayList)
         }
     }

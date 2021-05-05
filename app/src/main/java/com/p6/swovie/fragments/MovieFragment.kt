@@ -61,7 +61,9 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     private lateinit var buttonFilter: Button
     private lateinit var buttonMatches: Button
     private var popularMoviesPage: Int = 1
+    private var popularMoviesPageExtra: Int = 1
     private var pagesToLoad: Int = 0
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -75,6 +77,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
 
         isInGroup = MainActivity.isInGroup
 
+        progressBar = root.findViewById(R.id.progress_bar)
 
         //get group code
         db.collection("groups").whereArrayContains("users", uid).get()
@@ -219,6 +222,10 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         var tempList: MutableList<Movie> = movies as MutableList<Movie>
         tempList.removeAll(swipedMoviesList)
         updateAdapter(tempList)
+        if(pagesToLoad == popularMoviesPageExtra){
+            progressBar.visibility = View.GONE
+        }
+        popularMoviesPageExtra++
     }
 
     private fun updateAdapter(list: MutableList<Movie>){

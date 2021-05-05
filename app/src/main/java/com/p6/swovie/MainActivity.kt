@@ -2,8 +2,6 @@ package com.p6.swovie
 
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -13,7 +11,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.p6.swovie.fragments.*
-import java.lang.NullPointerException
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
@@ -45,7 +42,7 @@ class MainActivity : AppCompatActivity() {
                     if (isInGroup){
                         replaceFragment(MovieFragment())
                     } else {
-                        replaceFragment(NoSwipeForUHaHaFragment())
+                        replaceFragment(NoGroupMovieFragment())
                     }
                 }
                 .addOnFailureListener { exception ->
@@ -62,7 +59,7 @@ class MainActivity : AppCompatActivity() {
             if (isInGroup){
                 replaceFragment(MovieFragment())
             } else {
-                replaceFragment(NoSwipeForUHaHaFragment())
+                replaceFragment(NoGroupMovieFragment())
             }
         } else if (item.itemId == R.id.ic_match){
             if(isInGroup){
