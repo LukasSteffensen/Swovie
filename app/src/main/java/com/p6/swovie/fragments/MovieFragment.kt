@@ -36,8 +36,6 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     private val TAG = "MovieFragment"
 
     private var isInGroup = false
-    private lateinit var imageViewMovie: ImageView
-    private lateinit var textViewTitle: TextView
     private lateinit var matchFragment: Fragment
     private lateinit var secondMatchFragment: Fragment
     private val superLike = 0
@@ -63,7 +61,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     private lateinit var buttonFilter: Button
     private lateinit var buttonMatches: Button
     private var popularMoviesPage: Int = 1
-    private var hasSwipedBefore = false
+    private var pagesToLoad: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -75,17 +73,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         //initialize uid
         uid = auth.currentUser.uid
 
-        //set isInGroup boolean
-        if (auth.currentUser != null) {
-            db.collection("groups").whereArrayContains("users", uid).get()
-                .addOnSuccessListener { document ->
-                    isInGroup = !document.isEmpty
-                    Log.i(TAG, "isInGroup is True")
-                }
-                .addOnFailureListener { exception ->
-                    Log.d(TAG, "get failed with ", exception)
-                }
-        }
+        isInGroup = MainActivity.isInGroup
 
 
         //get group code
@@ -140,15 +128,19 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
 
         swipedMoviesList = loadSharedPreferencesList(requireContext())
         Log.i(TAG, "Movies that have been swiped before $swipedMoviesList")
-        hasSwipedBefore = !swipedMoviesList.isNullOrEmpty()
+
+        pagesToLoad = (swipedMoviesList.size/20)+1
+        Log.i(TAG, "Number of pages to load: $pagesToLoad")
+
+        while (pagesToLoad > popularMoviesPage-1){
+            loadMoreMovies(popularMoviesPage)
+            Log.i(TAG, "loaded page: ${popularMoviesPage-1}")
+        }
 
         return root
     }
 
-    override fun onStart() {
-        loadMoreMovies()
-        super.onStart()
-    }
+
 
     private fun saveSharedPreferencesList(context: Context, list: MutableList<Movie>) {
         val mPrefs: SharedPreferences =
@@ -224,58 +216,30 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     }
 
     private fun onPopularMoviesFetched(movies: List<Movie>) {
-        Log.d("MovieFragment", "Movies: $movies")
-        if (!hasSwipedBefore) {
-            movieList = movies as MutableList<Movie>
-            movieList.addAll(movies)
-            adapter = CardStackAdapter(movies)
-            cardStackView.layoutManager = manager
-            cardStackView.adapter = adapter
-            cardStackView.itemAnimator = DefaultItemAnimator()
-            Log.i(TAG, "should only be called once")
-        } else {
-            movieList.addAll(movies)
-            updateAdapter(movieList)
-        }
-        if (swipedMoviesList.size >= movieList.size) {
-            loadMoreMovies()
-        } else {
-            movieList.removeAll(swipedMoviesList)
-            Log.i(TAG, "Removed elements")
-            Log.i(TAG, movieList.toString())
-            adapter.setList(movieList)
-            adapter.notifyDataSetChanged()
-        }
-        popularMoviesPage++
+        var tempList: MutableList<Movie> = movies as MutableList<Movie>
+        tempList.removeAll(swipedMoviesList)
+        updateAdapter(tempList)
     }
 
     private fun updateAdapter(list: MutableList<Movie>){
-        adapter.setList(list)
+        adapter.updateList(list)
         val previousPosition = manager.topPosition
         adapter.notifyDataSetChanged()
         manager.topPosition = previousPosition
     }
 
 
-    private fun loadMoreMovies() {
+    private fun loadMoreMovies(page: Int) {
         MoviesRepository.getPopularMovies(
-            popularMoviesPage,
+            page,
             onSuccess = ::onPopularMoviesFetched,
             onError = ::onError
         )
+        popularMoviesPage++
     }
 
     private fun onError() {
         toast("Error fetching movies")
-    }
-
-    private fun populateDetails(extras: Bundle) {
-        extras.getString(MOVIE_POSTER)?.let { posterPath ->
-            Glide.with(this)
-                .load("https://image.tmdb.org/t/p/w342$posterPath")
-                .transform(CenterCrop())
-                .into(imageViewMovie)
-        }
     }
 
     private fun replaceFragment(fragment: Fragment) {
@@ -283,11 +247,6 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
             replace(R.id.fl_wrapper, fragment)
             commit()
         }
-    }
-
-    override fun onPause() {
-        popularMoviesPage = 1
-        super.onPause()
     }
 
     private fun toast(message: String) {
@@ -315,10 +274,10 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         }
         Log.i(
             TAG,
-            "\nMovies in adapter: ${adapter.itemCount}\n Movies left in manager: ${manager.topPosition}"
+            "\nMovies in adapter: ${adapter.getList().size}\n Movies left in manager: ${manager.topPosition}"
         )
-        if (manager.topPosition == adapter.itemCount - 5) {
-            loadMoreMovies()
+        if (manager.topPosition >= adapter.itemCount - 5) {
+            loadMoreMovies(popularMoviesPage)
             Log.i(TAG, "Loading more movies")
         }
     }
