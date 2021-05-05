@@ -232,26 +232,42 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                     arrayListOf()
                 }
 
+                val allSwipes = likes + superlikes + nottodays + nevers
+                Log.i(TAG, allSwipes.toString() + " swiped on this movie: " + movieId + " titled: " + match.title.toString())
 
-                //likes = document?.get("Like") as ArrayList<String>
-                //superlikes = document.get("Super Like") as ArrayList<String>
-                //nottodays = document.get("Not Today") as ArrayList<String>
-                //nevers = document.get("Never") as ArrayList<String>
+                val users = Array(allSwipes.size) { "" }
+                var n = 0
+                    for (user in allSwipes) {
+                        db.collection("users").document(user)
+                            .get()
+                            .addOnCompleteListener { task2 ->
+                                val document2 = task2.result
 
-            val users = Array(likes.size) { "" }
-            var n = 0
-                for (user in likes) {
-                    db.collection("users").document(user)
-                        .get()
-                        .addOnCompleteListener { task2 ->
-                            val document2 = task2.result
-                            users[n] = document2?.data!!["name"].toString()
-                            n++
-                            if (n == likes.size) {
-                                swipesDialog(users)
+
+                                when {
+                                    likes.contains(user) -> {
+                                        users[n] = document2?.data!!["name"].toString() + " liked this movie"
+                                    }
+                                    superlikes.contains(user) -> {
+                                        users[n] = document2?.data!!["name"].toString() + " superliked this movie"
+                                    }
+                                    nottodays.contains(user) -> {
+                                        users[n] = document2?.data!!["name"].toString() + " is neutral"
+                                    }
+                                    nevers.contains(user) -> {
+                                        users[n] = document2?.data!!["name"].toString() + " hated this movie"
+                                    }
+                                    else -> {
+                                        Log.i(TAG, "Error finding user")
+                                    }
+                                }
+                                n++
+
+                                if (n == allSwipes.size) {
+                                    swipesDialog(users, match)
+                                }
                             }
-                        }
-                }
+                    }
         }
     }
 
@@ -267,10 +283,12 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         }
     }
 
-    private fun swipesDialog(array: Array<String>){
+    private fun swipesDialog(array: Array<String>, match: Match){
+
+        val movieTitle = match.title.toString()
         context?.let {
             MaterialAlertDialogBuilder(it)
-                .setTitle(resources.getString(R.string.viewswipes))
+                .setTitle(movieTitle)
                 .setItems(array) { _, _ ->
                 }
                 .setNeutralButton("Close") { _, _ ->
