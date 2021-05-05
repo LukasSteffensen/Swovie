@@ -57,6 +57,5 @@ class MatchAdapter(private val matches: MutableList<Match>, private val itemClic
     interface OnClickListener {
         fun onViewSwipesClick(match: Match)
     }
-
 }
 
