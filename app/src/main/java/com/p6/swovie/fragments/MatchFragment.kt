@@ -57,7 +57,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_match2, container, false)
+        val root = inflater.inflate(R.layout.fragment_match, container, false)
 
         //Initialize uid
         uid = auth.currentUser.uid
@@ -188,7 +188,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                             val document2 = task2.result
                             users[n] = document2?.data!!["name"].toString()
                             n++
-                            if (task2.isSuccessful) {
+                            if (n == userIds.size) {
                                 alertDialog(users)
                             }
                         }
@@ -247,7 +247,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                             val document2 = task2.result
                             users[n] = document2?.data!!["name"].toString() + " liked this movie"
                             n++
-                            if (task2.isSuccessful) {
+                            if (n == likes.size) {
                                 swipesDialog(users, match)
                             }
                         }
@@ -258,7 +258,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
     private fun alertDialog(array: Array<String>){
         context?.let {
             MaterialAlertDialogBuilder(it)
-                .setTitle(resources.getString(R.string.viewmembers))
+                .setTitle("Group members")
                 .setItems(array) { _, _ ->
                 }
                 .setNeutralButton("Close") { _, _ ->

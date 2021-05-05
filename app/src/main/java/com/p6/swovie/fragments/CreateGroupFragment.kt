@@ -45,7 +45,7 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_match, container, false)
+        val root = inflater.inflate(R.layout.fragment_group, container, false)
 
         //Components from fragment_match layout
         buttonCreate = root.findViewById(R.id.button_create_group)
