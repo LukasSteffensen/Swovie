@@ -232,26 +232,23 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                     arrayListOf()
                 }
 
+                val allSwipes = likes.size + superlikes.size + nottodays.size + nevers.size
+                Log.i(TAG, allSwipes.toString() + " swiped on this movie")
 
-                //likes = document?.get("Like") as ArrayList<String>
-                //superlikes = document.get("Super Like") as ArrayList<String>
-                //nottodays = document.get("Not Today") as ArrayList<String>
-                //nevers = document.get("Never") as ArrayList<String>
-
-            val users = Array(likes.size) { "" }
-            var n = 0
-                for (user in likes) {
-                    db.collection("users").document(user)
-                        .get()
-                        .addOnCompleteListener { task2 ->
-                            val document2 = task2.result
-                            users[n] = document2?.data!!["name"].toString() + " liked this movie"
-                            n++
-                            if (n == likes.size) {
-                                swipesDialog(users, match)
+                val users = Array(likes.size) { "" }
+                var n = 0
+                    for (user in likes) {
+                        db.collection("users").document(user)
+                            .get()
+                            .addOnCompleteListener { task2 ->
+                                val document2 = task2.result
+                                users[n] = document2?.data!!["name"].toString() + " liked this movie"
+                                n++
+                                if (n == likes.size) {
+                                    swipesDialog(users, match)
+                                }
                             }
-                        }
-                }
+                    }
         }
     }
 
