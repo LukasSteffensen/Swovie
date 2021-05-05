@@ -134,13 +134,13 @@ class RegisterActivity : AppCompatActivity() {
              .document(userID).set(user)
              .addOnSuccessListener {
                  Log.d(TAG, "DocumentSnapshot added with ID: $userID")
-                 auth.signOut()
+//                 auth.signOut()
              }
              .addOnFailureListener { e ->
                  Log.w(TAG, "Error adding document", e)
              }
 
-         val intent = Intent(this, LoginActivity::class.java)
+         val intent = Intent(this, TutorialActivity::class.java)
          startActivity(intent)
      }
 
@@ -149,13 +149,13 @@ class RegisterActivity : AppCompatActivity() {
              .addOnCompleteListener(this) { task ->
                  if (task.isSuccessful) {
                      userID = auth.currentUser!!.uid
-                     auth.currentUser?.sendEmailVerification()
-                         ?.addOnSuccessListener (this) {
-                             if (task.isSuccessful) {
-                                 toast("A verification email has been sent")
+//                     auth.currentUser?.sendEmailVerification()
+//                         ?.addOnSuccessListener (this) {
+//                             if (task.isSuccessful) {
+//                                 toast("A verification email has been sent")
                                  addUserToDatabase()
-                             }
-                         }
+//                             }
+//                         }
                      // Sign in success, update UI with the signed-in user's information
                      Log.d(TAG, "createUserWithEmail:success")
                  } else {

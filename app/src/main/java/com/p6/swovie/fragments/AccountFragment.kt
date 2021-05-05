@@ -20,6 +20,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.p6.swovie.LoginActivity
 import com.p6.swovie.R
+import com.p6.swovie.TutorialActivity
 
 class AccountFragment : Fragment(), View.OnClickListener {
 
@@ -92,7 +93,8 @@ class AccountFragment : Fragment(), View.OnClickListener {
         builder.setPositiveButton(R.string.alertyes) { _, _ ->
             when (button) { // based on buttons, when pressed yes do the action
                 buttonLogout -> { logOut() }
-                buttonResetPassword -> { resetPassword() }
+                buttonResetPassword -> openTutorial()
+                //{ resetPassword() }
 //                buttonResetSwipes -> { toast("Reset all swipes clicked yes") }
                 else -> { toast("Error occurred") }
             }
@@ -103,6 +105,11 @@ class AccountFragment : Fragment(), View.OnClickListener {
         val alertDialog: AlertDialog = builder.create()
         alertDialog.setCancelable(false)
         alertDialog.show()
+    }
+
+    private fun openTutorial() {
+        val intent = Intent(activity, TutorialActivity::class.java)
+        startActivity(intent)
     }
 
     private fun logOut() {

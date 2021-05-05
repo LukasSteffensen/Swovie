@@ -109,11 +109,6 @@ class SearchFragment : Fragment() {
         }
     }
 
-    override fun onPause() {
-        popularMoviesPage = 1
-        super.onPause()
-    }
-
     private fun onSearchError() { //Used in getPopularMovies
         Log.i(TAG, "Error fetching searched movies")
     }
