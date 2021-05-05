@@ -72,24 +72,15 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_movie, container, false)
 
-        //initialize uid
+        // initialize uid
         uid = auth.currentUser.uid
+
+        // initialize group code
+        groupCode = MainActivity.groupCode
 
         isInGroup = MainActivity.isInGroup
 
         progressBar = root.findViewById(R.id.progress_bar)
-
-        //get group code
-        db.collection("groups").whereArrayContains("users", uid).get()
-            .addOnSuccessListener { document ->
-                if (!document.isEmpty) {
-                    groupCode = document.documents[0].id
-                    Log.i(TAG, "group code: $groupCode")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d(TAG, "get failed with ", exception)
-            }
 
         cardStackView = root.findViewById(R.id.card_stack_view)
         manager = CardStackLayoutManager(context, this)

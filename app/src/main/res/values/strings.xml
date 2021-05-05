@@ -85,4 +85,6 @@
     <string name="genre18">Western</string>
     <string name="noSwipeString">You are not in a group. Join or create a group to start swiping!</string>
     <string name="joinOrCreateGroup">Join/Create Group</string>
+    <string name="no">No</string>
+    <string name="surexit">Are you sure you wish to exit Swovie?</string>
 </resources>

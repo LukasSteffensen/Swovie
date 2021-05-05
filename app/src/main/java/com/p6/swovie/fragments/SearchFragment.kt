@@ -160,6 +160,7 @@ class SearchFragment : Fragment() {
         val intent = Intent(activity, MovieDetailsActivity::class.java)
         intent.putExtra(MOVIE_POSTER, movie.posterPath)
         intent.putExtra(MOVIE_TITLE, movie.title)
+        intent.putExtra(MOVIE_ID, movie.id)
         intent.putExtra(MOVIE_OVERVIEW, movie.overview)
         startActivity(intent)
     }

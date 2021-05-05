@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
@@ -16,6 +17,7 @@ import kotlin.system.exitProcess
 class MainActivity : AppCompatActivity() {
 
     companion object DataHolder{
+        var groupCode: String = ""
         var isInGroup: Boolean = false
     }
 
@@ -32,6 +34,8 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation = findViewById(R.id.navigation_bar)
 
         bottomNavigation.isClickable = false
+
+        getGroupCode()
 
         if(auth.currentUser != null) {
             db.collection("groups").whereArrayContains("users", auth.currentUser.uid).get()
@@ -52,6 +56,20 @@ class MainActivity : AppCompatActivity() {
 
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
+    }
+
+    private fun getGroupCode() {
+        //get group code
+        db.collection("groups").whereArrayContains("users", auth.currentUser.uid).get()
+            .addOnSuccessListener { document ->
+                if (!document.isEmpty) {
+                    groupCode = document.documents[0].id
+                    Log.i(TAG, "group code: $groupCode")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d(TAG, "get failed with ", exception)
+            }
     }
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -83,21 +101,41 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        var fm: FragmentManager = supportFragmentManager
-        when {
-            fm.backStackEntryCount > 1 -> {
-                Log.i(TAG, "popping back stack")
-                fm.popBackStack()
-            }
-            fm.backStackEntryCount == 1 -> {
-                Log.i(TAG, "Nothing on back stack, closing app")
-                moveTaskToBack(true)
-                exitProcess(-1)
-            }
-            else -> {
-                super.onBackPressed()
-            }
+    private fun closeAppDialog(){
+        this.let {
+            MaterialAlertDialogBuilder(it)
+                .setTitle(getString(R.string.surexit))
+                .setNegativeButton(getString(R.string.no)) { _, _ ->
+                }
+                .setPositiveButton(R.string.alertyes) { _, _ ->
+                    exitApp()
+                }
+                .show()
         }
+    }
+
+    private fun exitApp() {
+        moveTaskToBack(true)
+        exitProcess(-1)
+    }
+
+    override fun onBackPressed() {
+        // Commented out all the things that caused bugs,
+        // we decided back press from main activity should always close app
+        // and navigation should only go through navigation bar
+//        var fm: FragmentManager = supportFragmentManager
+//        when {
+//            fm.backStackEntryCount > 1 -> {
+//                Log.i(TAG, "popping back stack")
+//                fm.popBackStack()
+//            }
+//            fm.backStackEntryCount == 1 -> {
+//                Log.i(TAG, "Nothing on back stack, closing app")
+                closeAppDialog()
+//            }
+//            else -> {
+                super.onBackPressed()
+//            }
+//        }
     }
 }
