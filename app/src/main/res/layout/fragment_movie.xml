@@ -162,4 +162,17 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
 
+    <ImageView
+        android:id="@+id/imageViewInfo"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginTop="404dp"
+        android:src="@drawable/ic_baseline_info_24"
+        app:layout_constraintBottom_toTopOf="@+id/imageView_never"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.952"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout_top"
+        app:layout_constraintVertical_bias="0.66" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

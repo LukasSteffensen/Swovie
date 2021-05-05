@@ -1,10 +1,12 @@
 package com.p6.swovie
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -27,6 +29,7 @@ const val MOVIE_TITLE = "extra_movie_title"
 const val MOVIE_ID = "extra_movie_id"
 const val MOVIE_POSTER = "extra_movie_poster"
 const val MOVIE_OVERVIEW = "extra_movie_overview"
+const val PREVIOUS_FRAGMENT = "extra_fragment"
 
 
 class MovieDetailsActivity : AppCompatActivity() {
@@ -37,6 +40,8 @@ class MovieDetailsActivity : AppCompatActivity() {
     private var auth: FirebaseAuth = Firebase.auth
     private lateinit var uid: String
     private lateinit var groupCode: String
+
+    private lateinit var previousFragment: String
 
     private val superLike = 0
     private val like = 1
@@ -68,21 +73,44 @@ class MovieDetailsActivity : AppCompatActivity() {
         buttonLike = findViewById(R.id.imageView_like)
         buttonSuperLike = findViewById(R.id.imageView_super_like)
 
-        val extras = intent.extras
+        buttonLike.visibility = View.INVISIBLE
+        buttonSuperLike.visibility = View.INVISIBLE
+        buttonNotToday.visibility = View.INVISIBLE
+        buttonNever.visibility = View.INVISIBLE
 
         groupCode = MainActivity.groupCode
 
+        val extras = intent.extras
+
+        if (extras != null) {
+            populateDetails(extras)
+        } else {
+            finish()
+        }
+
+        showButtons()
+
+
+
         buttonLike.setOnClickListener {
             saveSwipeToDatabase(like)
+            if (previousFragment == "Movie") {
+                startActivity(Intent(applicationContext,MainActivity::class.java))
+            } else {
+                onBackPressed()
+            }
         }
         buttonSuperLike.setOnClickListener {
             saveSwipeToDatabase(superLike)
+            onBackPressed()
         }
         buttonNotToday.setOnClickListener {
             saveSwipeToDatabase(notToday)
+            onBackPressed()
         }
         buttonNever.setOnClickListener {
             saveSwipeToDatabase(never)
+            onBackPressed()
         }
 
         textViewDescriptionDetails.movementMethod = ScrollingMovementMethod()
@@ -93,10 +121,44 @@ class MovieDetailsActivity : AppCompatActivity() {
         swipedMoviesList = loadSharedPreferencesList(this)
 
 
-        if (extras != null) {
-            populateDetails(extras)
-        } else {
-            finish()
+    }
+
+    private fun showButtons() {
+        if (MainActivity.isInGroup) {
+            db.collection("groups")
+                .document(groupCode)
+                .collection("swipes")
+                .document(movie.id.toString())
+                .get()
+                .addOnSuccessListener { result ->
+                    var superLikes = if (result.get("Super like") != null) {
+                        result.get("Super like") as ArrayList<String>
+                    } else {
+                        arrayListOf()
+                    }
+                    var likes = if (result.get("Like") != null) {
+                        result.get("Like") as ArrayList<String>
+                    } else {
+                        arrayListOf()
+                    }
+                    var notTodays = if (result.get("Not today") != null) {
+                        result.get("Not today") as ArrayList<String>
+                    } else {
+                        arrayListOf()
+                    }
+                    var nevers = if (result.get("Never") != null) {
+                        result.get("Never") as ArrayList<String>
+                    } else {
+                        arrayListOf()
+                    }
+                    val allSwipes = likes + superLikes + notTodays + nevers
+                    if (!allSwipes.contains(uid)) {
+                        buttonLike.visibility = View.VISIBLE
+                        buttonSuperLike.visibility = View.VISIBLE
+                        buttonNotToday.visibility = View.VISIBLE
+                        buttonNever.visibility = View.VISIBLE
+                    }
+                }
         }
     }
 
@@ -117,6 +179,8 @@ class MovieDetailsActivity : AppCompatActivity() {
             extras.getString(MOVIE_OVERVIEW).toString(),
             extras.getString(MOVIE_POSTER).toString()
         )
+
+        previousFragment = extras.getString(PREVIOUS_FRAGMENT).toString()
     }
 
     private fun loadSharedPreferencesList(context: Context): MutableList<Movie> {

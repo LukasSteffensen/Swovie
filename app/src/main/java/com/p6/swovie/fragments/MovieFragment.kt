@@ -58,6 +58,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     private lateinit var buttonNotToday: ImageButton
     private lateinit var buttonLike: ImageButton
     private lateinit var buttonSuperLike: ImageButton
+    private lateinit var buttonInfo: ImageView
     private lateinit var buttonFilter: Button
     private lateinit var buttonMatches: Button
     private var popularMoviesPage: Int = 1
@@ -99,6 +100,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         buttonNotToday = root.findViewById(R.id.imageView_not_today)
         buttonLike = root.findViewById(R.id.imageView_like)
         buttonSuperLike = root.findViewById(R.id.imageView_super_like)
+        buttonInfo = root.findViewById(R.id.imageViewInfo)
         buttonFilter = root.findViewById(R.id.button_filter)
         buttonMatches = root.findViewById(R.id.button_matches)
 
@@ -107,6 +109,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         buttonSuperLike.setOnClickListener(this)
         buttonNotToday.setOnClickListener(this)
         buttonNever.setOnClickListener(this)
+        buttonInfo.setOnClickListener(this)
         buttonFilter.setOnClickListener(this)
         buttonMatches.setOnClickListener(this)
 
@@ -133,8 +136,6 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
 
         return root
     }
-
-
 
     private fun saveSharedPreferencesList(context: Context, list: MutableList<Movie>) {
         val mPrefs: SharedPreferences =
@@ -199,6 +200,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
                 manager.setSwipeAnimationSetting(setting)
                 cardStackView.swipe()
             }
+            buttonInfo -> showMovieDetails(adapter.getList()[manager.topPosition])
             buttonFilter -> changeToFilters()
             buttonMatches -> replaceFragment(MatchFragment())
         }
@@ -294,6 +296,16 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
 
     override fun onCardDisappeared(view: View?, position: Int) {
 
+    }
+
+    private fun showMovieDetails(movie: Movie) { // Put information from the clicked movie to the Detailed activity
+        val intent = Intent(activity, MovieDetailsActivity::class.java)
+        intent.putExtra(MOVIE_POSTER, movie.posterPath)
+        intent.putExtra(MOVIE_TITLE, movie.title)
+        intent.putExtra(MOVIE_ID, movie.id)
+        intent.putExtra(MOVIE_OVERVIEW, movie.overview)
+        intent.putExtra(PREVIOUS_FRAGMENT, "Movie")
+        startActivity(intent)
     }
 
     private fun saveSwipeToDatabase(swipe: Int) {

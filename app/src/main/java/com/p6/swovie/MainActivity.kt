@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity() {
                 closeAppDialog()
 //            }
 //            else -> {
-                super.onBackPressed()
+//                super.onBackPressed()
 //            }
 //        }
     }
