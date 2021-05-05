@@ -59,6 +59,9 @@ class SearchFragment : Fragment() {
         searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 searchQuery = query.toString()
+                Log.i(TAG, "Searching for: $searchQuery")
+                popularMoviesAdapter.setList(arrayListOf())
+                searchedMoviePage = 1
                 getSearchedMovies(searchQuery, searchedMoviePage)
                 hideKeyboard()
                 return true
