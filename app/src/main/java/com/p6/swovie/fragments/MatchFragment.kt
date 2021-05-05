@@ -232,19 +232,38 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                     arrayListOf()
                 }
 
-                val allSwipes = likes.size + superlikes.size + nottodays.size + nevers.size
-                Log.i(TAG, allSwipes.toString() + " swiped on this movie")
+                val allSwipes = likes + superlikes + nottodays + nevers
+                Log.i(TAG, allSwipes.toString() + " swiped on this movie: " + movieId + " titled: " + match.title.toString())
 
-                val users = Array(likes.size) { "" }
+                val users = Array(allSwipes.size) { "" }
                 var n = 0
-                    for (user in likes) {
+                    for (user in allSwipes) {
                         db.collection("users").document(user)
                             .get()
                             .addOnCompleteListener { task2 ->
                                 val document2 = task2.result
-                                users[n] = document2?.data!!["name"].toString() + " liked this movie"
+
+
+                                when {
+                                    likes.contains(user) -> {
+                                        users[n] = document2?.data!!["name"].toString() + " liked this movie"
+                                    }
+                                    superlikes.contains(user) -> {
+                                        users[n] = document2?.data!!["name"].toString() + " superliked this movie"
+                                    }
+                                    nottodays.contains(user) -> {
+                                        users[n] = document2?.data!!["name"].toString() + " is neutral"
+                                    }
+                                    nevers.contains(user) -> {
+                                        users[n] = document2?.data!!["name"].toString() + " hated this movie"
+                                    }
+                                    else -> {
+                                        Log.i(TAG, "Error finding user")
+                                    }
+                                }
                                 n++
-                                if (n == likes.size) {
+
+                                if (n == allSwipes.size) {
                                     swipesDialog(users, match)
                                 }
                             }
