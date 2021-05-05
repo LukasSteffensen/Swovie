@@ -40,7 +40,6 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     private lateinit var textViewTitle: TextView
     private lateinit var matchFragment: Fragment
     private lateinit var secondMatchFragment: Fragment
-    private val client = OkHttpClient()
     private val superLike = 0
     private val like = 1
     private val notToday = 2
@@ -215,11 +214,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
                 cardStackView.swipe()
             }
             buttonFilter -> changeToFilters()
-            buttonMatches -> if (isInGroup) {
-                replaceFragment(secondMatchFragment)
-            } else {
-                replaceFragment(matchFragment)
-            }
+            buttonMatches -> replaceFragment(MatchFragment())
         }
     }
 

@@ -57,7 +57,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_match2, container, false)
+        val root = inflater.inflate(R.layout.fragment_match, container, false)
 
         //Initialize uid
         uid = auth.currentUser.uid
