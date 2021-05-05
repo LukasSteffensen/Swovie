@@ -249,14 +249,15 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                                         users[n] = document2?.data!!["name"].toString() + " liked this movie"
                                     }
                                     superlikes.contains(user) -> {
-                                        users[n] = document2?.data!!["name"].toString() + " superliked this movie"
+                                        users[n] = document2?.data!!["name"].toString() + " super liked this movie"
                                     }
                                     nottodays.contains(user) -> {
                                         users[n] = document2?.data!!["name"].toString() + " is neutral"
                                     }
                                     nevers.contains(user) -> {
-                                        users[n] = document2?.data!!["name"].toString() + " hated this movie"
+                                        users[n] = document2?.data!!["name"].toString() + " hates this movie"
                                     }
+                                    //TODO User has not swiped this movie maybe?
                                     else -> {
                                         Log.i(TAG, "Error finding user")
                                     }

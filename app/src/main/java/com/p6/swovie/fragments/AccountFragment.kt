@@ -15,7 +15,6 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.p6.swovie.LoginActivity
@@ -29,7 +28,7 @@ class AccountFragment : Fragment(), View.OnClickListener {
     private val JSON_URL_LOGO = "https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg"
     private lateinit var imageViewLogo: ImageView
     private lateinit var textViewName: TextView
-    private lateinit var buttonResetSwipes: Button
+    private lateinit var buttonViewInstructions: Button
     private lateinit var buttonResetPassword: Button
     private lateinit var buttonLogout: Button
 
@@ -53,7 +52,7 @@ class AccountFragment : Fragment(), View.OnClickListener {
 
         textViewName = root.findViewById(R.id.textView_username)
         imageViewLogo = root.findViewById(R.id.imageView_logo)
-//        buttonResetSwipes = root.findViewById(R.id.button_reset_swipes)
+        buttonViewInstructions = root.findViewById(R.id.button_view_instructions)
         buttonResetPassword = root.findViewById(R.id.button_reset_password)
         buttonLogout = root.findViewById(R.id.button_logout)
 
@@ -61,7 +60,7 @@ class AccountFragment : Fragment(), View.OnClickListener {
                 .load(JSON_URL_LOGO)
                 .into(imageViewLogo)
 
-//        buttonResetSwipes.setOnClickListener(this)
+        buttonViewInstructions.setOnClickListener(this)
         buttonResetPassword.setOnClickListener(this)
         buttonLogout.setOnClickListener(this)
 
@@ -81,6 +80,7 @@ class AccountFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(view: View?) { // All OnClick buttons, with strings depending on button
         when (view) {
+            buttonViewInstructions -> openTutorial()
             buttonResetPassword -> alert(getString(R.string.resetpassword), getString(R.string.alertpassword), buttonResetPassword)
             buttonLogout -> alert(getString(R.string.logout), getString(R.string.alertlogout), buttonLogout)
         }
@@ -93,9 +93,7 @@ class AccountFragment : Fragment(), View.OnClickListener {
         builder.setPositiveButton(R.string.alertyes) { _, _ ->
             when (button) { // based on buttons, when pressed yes do the action
                 buttonLogout -> { logOut() }
-                buttonResetPassword -> openTutorial()
-                //{ resetPassword() }
-//                buttonResetSwipes -> { toast("Reset all swipes clicked yes") }
+                buttonResetPassword -> { resetPassword() }
                 else -> { toast("Error occurred") }
             }
         }
