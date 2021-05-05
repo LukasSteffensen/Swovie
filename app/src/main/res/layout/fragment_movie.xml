@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/nottoday"
-            android:src="@drawable/ic_sync" />
+            android:src="@drawable/close_thick_small" />
 
         <ImageButton
             android:id="@+id/imageView_like"
