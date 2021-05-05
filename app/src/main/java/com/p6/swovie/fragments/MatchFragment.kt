@@ -194,7 +194,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                             users[n] = document2?.data!!["name"].toString()
                             n++
                             if (n == userIds.size) {
-                                alertDialog(users)
+                                membersDialog(users)
                             }
                         }
                 }
@@ -285,13 +285,26 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         }
     }
 
-    private fun alertDialog(array: Array<String>){
+    private fun membersDialog(array: Array<String>){
         context?.let {
             MaterialAlertDialogBuilder(it)
                 .setTitle("Group members")
                 .setItems(array) { _, _ ->
                 }
                 .setNeutralButton("Close") { _, _ ->
+                }
+                .show()
+        }
+    }
+
+    private fun leaveGroupDialog(){
+        context?.let {
+            MaterialAlertDialogBuilder(it)
+                .setTitle("Are you sure you wish to leave group?")
+                .setNegativeButton("No") { _, _ ->
+                }
+                .setPositiveButton(R.string.alertyes) { _, _ ->
+                    leaveGroup()
                 }
                 .show()
         }
@@ -409,7 +422,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
     override fun onClick(v: View?) {
         when (v) {
             buttonViewMembers -> viewMembers()
-            buttonLeave -> leaveGroup()
+            buttonLeave -> leaveGroupDialog()
         }
     }
 
