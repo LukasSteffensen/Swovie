@@ -77,7 +77,8 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         buttonViewMembers.setOnClickListener(this)
         buttonLeave.setOnClickListener(this)
 
-        getGroupCode()
+        groupCode = MainActivity.groupCode
+        getSwipes()
 
 
         return root
@@ -333,10 +334,10 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
             .addOnSuccessListener { document ->
                 var array: ArrayList<String> = document.get("users") as ArrayList<String>
                 if (array.size == 1) {
-                    deleteSwipesAndSharedPref()
                     //Delete group if you are the last group member
                     docRef.delete()
                         .addOnSuccessListener {
+                            deleteSwipesAndSharedPref()
                             replaceFragment(CreateGroupFragment())
                             Log.d(TAG, "DocumentSnapshot successfully deleted!")
                         }
@@ -386,24 +387,6 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         val prefsEditor = mPrefs.edit()
         prefsEditor.clear()
         prefsEditor.commit()
-    }
-
-    private fun getGroupCode() {
-        db.collection("groups").whereArrayContains("users", uid).get()
-            .addOnSuccessListener { document ->
-                if (!document.isEmpty) {
-                    groupCode = document.documents[0].id
-                    var groupArrayList: ArrayList<String> = arrayListOf<String>()
-                    groupArrayList = document.documents[0].get("users") as ArrayList<String>
-                    groupSize = groupArrayList.size
-                    getSwipes()
-                    Log.i(TAG, "group code: $groupCode")
-                    textViewGroup.text = "Group code: $groupCode"
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d(TAG, "get failed with ", exception)
-            }
     }
 
     private fun toast(message: String) {

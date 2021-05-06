@@ -141,6 +141,7 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
             )
             docRef.update(updates).addOnSuccessListener {
                 MainActivity.isInGroup = true
+                MainActivity.groupCode = groupCode
                 replaceFragment(secondMatchFragment)
             }.addOnFailureListener {
                 toast("Group $code does not exist")
@@ -158,6 +159,8 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
         val userIdList: ArrayList<String> = ArrayList()
 
         val generatedGroupCode = generateGroupId()
+
+        MainActivity.groupCode = generatedGroupCode
 
         userIdList.add(uid)
 
