@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.common.reflect.TypeToken
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -54,6 +55,7 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
     private var movieList: MutableList<Movie> = arrayListOf()
     private lateinit var swipedMoviesList: MutableList<Movie>
 
+    private lateinit var bottomNavigation: BottomNavigationView
     private lateinit var buttonNever: ImageButton
     private lateinit var buttonNotToday: ImageButton
     private lateinit var buttonLike: ImageButton
@@ -82,6 +84,8 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
         isInGroup = MainActivity.isInGroup
 
         progressBar = root.findViewById(R.id.progress_bar)
+
+        bottomNavigation = activity!!.findViewById(R.id.navigation_bar)
 
         cardStackView = root.findViewById(R.id.card_stack_view)
         manager = CardStackLayoutManager(context, this)
@@ -202,7 +206,10 @@ class MovieFragment : Fragment(), View.OnClickListener, CardStackListener {
             }
             buttonInfo -> showMovieDetails(adapter.getList()[manager.topPosition])
             buttonFilter -> changeToFilters()
-            buttonMatches -> replaceFragment(MatchFragment())
+            buttonMatches -> {
+                bottomNavigation.selectedItemId = R.id.ic_match
+                replaceFragment(MatchFragment())
+            }
         }
     }
 
