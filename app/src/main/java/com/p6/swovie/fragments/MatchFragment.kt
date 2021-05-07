@@ -360,7 +360,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                     //Delete group if you are the last group member
                     docRef.delete()
                         .addOnSuccessListener {
-                            deleteSwipesAndSharedPref()
+                            deleteAllAndSharedPref()
                             replaceFragment(CreateGroupFragment())
                             Log.d(TAG, "DocumentSnapshot successfully deleted!")
                         }
@@ -380,6 +380,25 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                 }
             }.addOnFailureListener { e ->
                 Log.i(TAG, e.toString())
+            }
+    }
+
+    private fun deleteAllAndSharedPref() {
+        MainActivity.isInGroup = false
+        deleteSharedPreferencesList(requireContext())
+        deleteAllFromGroup()
+    }
+
+    private fun deleteAllFromGroup() {
+        val colRef = db.collection("groups")
+            .document(groupCode)
+            .collection("swipes")
+
+            colRef.get()
+            .addOnSuccessListener {result ->
+                for (document in result) {
+                    colRef.document(document.id).delete()
+                }
             }
     }
 
