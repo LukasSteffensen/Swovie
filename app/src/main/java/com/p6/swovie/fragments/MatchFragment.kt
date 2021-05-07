@@ -78,8 +78,9 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         buttonLeave.setOnClickListener(this)
 
         groupCode = MainActivity.groupCode
-        getSwipes()
-
+        textViewGroup.text = "Group Code: $groupCode"
+        //getGroupSize calls getSwipes
+        getGroupSize()
 
         return root
     }
@@ -91,6 +92,18 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
 
     override fun onViewSwipesClick(match: Match) {
         viewSwipes(match)
+    }
+
+    private fun getGroupSize() {
+        val docRef = db.collection("groups")
+            .document(groupCode)
+
+        docRef.get()
+            .addOnSuccessListener {
+                val userArrayList = it["users"] as ArrayList<*>
+                groupSize = userArrayList.size
+                getSwipes()
+            }
     }
 
     private fun getSwipes() {
@@ -160,7 +173,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                         Log.i(TAG, "Like: $likesDouble")
                         Log.i(TAG, "Not: $notTodayDouble")
                         Log.i(TAG, "Never: $neverDouble")
-                        Log.i(TAG, "match percentage: $matchPercentage")
+                        Log.i(TAG, "Match percentage: $matchPercentage")
                     }
                     setMovieTitles()
                 }
