@@ -60,6 +60,7 @@ class MovieDetailsActivity : AppCompatActivity() {
     private lateinit var buttonNotToday: ImageButton
     private lateinit var buttonLike: ImageButton
     private lateinit var buttonSuperLike: ImageButton
+    private lateinit var buttonBack: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +74,7 @@ class MovieDetailsActivity : AppCompatActivity() {
         buttonNotToday = findViewById(R.id.imageView_not_today)
         buttonLike = findViewById(R.id.imageView_like)
         buttonSuperLike = findViewById(R.id.imageView_super_like)
+        buttonBack = findViewById(R.id.back_button)
 
         buttonLike.visibility = View.INVISIBLE
         buttonSuperLike.visibility = View.INVISIBLE
@@ -92,6 +94,9 @@ class MovieDetailsActivity : AppCompatActivity() {
         showButtons()
 
 
+        buttonBack.setOnClickListener {
+            super.onBackPressed()
+        }
 
         buttonLike.setOnClickListener {
             saveSwipeToDatabase(like)
