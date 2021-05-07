@@ -115,6 +115,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
             }
     }
 
+
     private fun getSwipes() {
 
         val colRef = db.collection("groups")
