@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContentProviderCompat.requireContext
 import com.bumptech.glide.Glide
@@ -94,6 +95,7 @@ class MovieDetailsActivity : AppCompatActivity() {
 
         buttonLike.setOnClickListener {
             saveSwipeToDatabase(like)
+            toast("You liked ${movie.title}")
             if (previousFragment == "Movie") {
                 startActivity(Intent(applicationContext,MainActivity::class.java))
             } else {
@@ -102,15 +104,30 @@ class MovieDetailsActivity : AppCompatActivity() {
         }
         buttonSuperLike.setOnClickListener {
             saveSwipeToDatabase(superLike)
-            onBackPressed()
+            toast("You super liked ${movie.title}")
+            if (previousFragment == "Movie") {
+                startActivity(Intent(applicationContext,MainActivity::class.java))
+            } else {
+                onBackPressed()
+            }
         }
         buttonNotToday.setOnClickListener {
             saveSwipeToDatabase(notToday)
-            onBackPressed()
+            toast("You voted not today on ${movie.title}")
+            if (previousFragment == "Movie") {
+                startActivity(Intent(applicationContext,MainActivity::class.java))
+            } else {
+                onBackPressed()
+            }
         }
         buttonNever.setOnClickListener {
             saveSwipeToDatabase(never)
-            onBackPressed()
+            toast("You have voted never for ${movie.title}")
+            if (previousFragment == "Movie") {
+                startActivity(Intent(applicationContext,MainActivity::class.java))
+            } else {
+                onBackPressed()
+            }
         }
 
         textViewDescriptionDetails.movementMethod = ScrollingMovementMethod()
@@ -160,6 +177,10 @@ class MovieDetailsActivity : AppCompatActivity() {
                     }
                 }
         }
+    }
+
+    private fun toast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun populateDetails(extras: Bundle) {

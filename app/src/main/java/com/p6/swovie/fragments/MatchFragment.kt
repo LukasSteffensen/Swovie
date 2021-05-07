@@ -1,6 +1,7 @@
 package com.p6.swovie.fragments
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
@@ -20,10 +21,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.p6.swovie.MainActivity
-import com.p6.swovie.MatchAdapter
-import com.p6.swovie.MoviesRepository
-import com.p6.swovie.R
+import com.p6.swovie.*
 import com.p6.swovie.dataClasses.Match
 import com.p6.swovie.dataClasses.Movie
 import kotlin.collections.ArrayList
@@ -79,19 +77,30 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
 
         groupCode = MainActivity.groupCode
         textViewGroup.text = "Group Code: $groupCode"
-        //getGroupSize calls getSwipes
-        getGroupSize()
+        //getGroupSize() calls getSwipes()
+//        getGroupSize()
 
         return root
     }
 
     override fun onResume() {
         matchArrayList = arrayListOf()
+        matchRecyclerView.visibility = View.INVISIBLE
+        progressBar.visibility = View.VISIBLE
+        getGroupSize()
         super.onResume()
     }
 
     override fun onViewSwipesClick(match: Match) {
         viewSwipes(match)
+    }
+
+    override fun onMatchClick(match: Match) {
+        showMovieDetails(match)
+    }
+
+    private fun showMovieDetails(match: Match) {
+        getMovieFromMatch(match.movieId?.toInt()!!)
     }
 
     private fun getGroupSize() {
@@ -429,6 +438,22 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         )
     }
 
+    private fun getMovieFromMatch(movieId: Int) {
+        MoviesRepository.getMovieDetails(movieId,
+            onSuccess = ::onMatchMovieFetched,
+            onError = ::onError
+        )
+    }
+
+    private fun onMatchMovieFetched(movie: Movie) {
+        val intent = Intent(activity, MovieDetailsActivity::class.java)
+        intent.putExtra(MOVIE_POSTER, movie.posterPath)
+        intent.putExtra(MOVIE_TITLE, movie.title)
+        intent.putExtra(MOVIE_ID, movie.id)
+        intent.putExtra(MOVIE_OVERVIEW, movie.overview)
+        startActivity(intent)
+    }
+
     private fun onMovieFetched(movie: Movie) { //Used in getPopularMovies. Fetch data if success
         Log.d(TAG, "Movie: $movie")
         Log.i(TAG, "Movie: ${movie.id} and ${movie.title}")
@@ -440,6 +465,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         colSize--
         if (colSize == 0) {
             progressBar.visibility = View.GONE
+            matchRecyclerView.visibility = View.VISIBLE
             setAdapter(matchArrayList)
         }
     }
