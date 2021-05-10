@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContentProviderCompat.requireContext
 import com.bumptech.glide.Glide
@@ -59,6 +60,7 @@ class MovieDetailsActivity : AppCompatActivity() {
     private lateinit var buttonNotToday: ImageButton
     private lateinit var buttonLike: ImageButton
     private lateinit var buttonSuperLike: ImageButton
+    private lateinit var buttonBack: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,6 +74,7 @@ class MovieDetailsActivity : AppCompatActivity() {
         buttonNotToday = findViewById(R.id.imageView_not_today)
         buttonLike = findViewById(R.id.imageView_like)
         buttonSuperLike = findViewById(R.id.imageView_super_like)
+        buttonBack = findViewById(R.id.back_button)
 
         buttonLike.visibility = View.INVISIBLE
         buttonSuperLike.visibility = View.INVISIBLE
@@ -91,9 +94,13 @@ class MovieDetailsActivity : AppCompatActivity() {
         showButtons()
 
 
+        buttonBack.setOnClickListener {
+            super.onBackPressed()
+        }
 
         buttonLike.setOnClickListener {
             saveSwipeToDatabase(like)
+            toast("You liked ${movie.title}")
             if (previousFragment == "Movie") {
                 startActivity(Intent(applicationContext,MainActivity::class.java))
             } else {
@@ -102,15 +109,30 @@ class MovieDetailsActivity : AppCompatActivity() {
         }
         buttonSuperLike.setOnClickListener {
             saveSwipeToDatabase(superLike)
-            onBackPressed()
+            toast("You super liked ${movie.title}")
+            if (previousFragment == "Movie") {
+                startActivity(Intent(applicationContext,MainActivity::class.java))
+            } else {
+                onBackPressed()
+            }
         }
         buttonNotToday.setOnClickListener {
             saveSwipeToDatabase(notToday)
-            onBackPressed()
+            toast("You voted not today on ${movie.title}")
+            if (previousFragment == "Movie") {
+                startActivity(Intent(applicationContext,MainActivity::class.java))
+            } else {
+                onBackPressed()
+            }
         }
         buttonNever.setOnClickListener {
             saveSwipeToDatabase(never)
-            onBackPressed()
+            toast("You have voted never for ${movie.title}")
+            if (previousFragment == "Movie") {
+                startActivity(Intent(applicationContext,MainActivity::class.java))
+            } else {
+                onBackPressed()
+            }
         }
 
         textViewDescriptionDetails.movementMethod = ScrollingMovementMethod()
@@ -160,6 +182,10 @@ class MovieDetailsActivity : AppCompatActivity() {
                     }
                 }
         }
+    }
+
+    private fun toast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun populateDetails(extras: Bundle) {

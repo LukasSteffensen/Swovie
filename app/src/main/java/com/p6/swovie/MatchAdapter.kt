@@ -3,7 +3,6 @@ package com.p6.swovie
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -50,12 +49,22 @@ class MatchAdapter(private val matches: MutableList<Match>, private val itemClic
             buttonViewSwipes.setOnClickListener {
                 clickListener.onViewSwipesClick(match)
             }
+            imageView.setOnClickListener {
+                clickListener.onMatchClick(match)
+            }
+            matchTextView.setOnClickListener {
+                clickListener.onMatchClick(match)
+            }
+            textViewPercentage.setOnClickListener {
+                clickListener.onMatchClick(match)
+            }
         }
 
     }
 
     interface OnClickListener {
         fun onViewSwipesClick(match: Match)
+        fun onMatchClick(match: Match)
     }
 }
 

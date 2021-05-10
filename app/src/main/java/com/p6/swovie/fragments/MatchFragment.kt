@@ -1,6 +1,7 @@
 package com.p6.swovie.fragments
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
@@ -20,10 +21,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.p6.swovie.MainActivity
-import com.p6.swovie.MatchAdapter
-import com.p6.swovie.MoviesRepository
-import com.p6.swovie.R
+import com.p6.swovie.*
 import com.p6.swovie.dataClasses.Match
 import com.p6.swovie.dataClasses.Movie
 import kotlin.collections.ArrayList
@@ -78,20 +76,45 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         buttonLeave.setOnClickListener(this)
 
         groupCode = MainActivity.groupCode
-        getSwipes()
-
+        textViewGroup.text = "Group Code: $groupCode"
+        //getGroupSize() calls getSwipes()
+//        getGroupSize()
 
         return root
     }
 
     override fun onResume() {
         matchArrayList = arrayListOf()
+        matchRecyclerView.visibility = View.INVISIBLE
+        progressBar.visibility = View.VISIBLE
+        getGroupSize()
         super.onResume()
     }
 
     override fun onViewSwipesClick(match: Match) {
         viewSwipes(match)
     }
+
+    override fun onMatchClick(match: Match) {
+        showMovieDetails(match)
+    }
+
+    private fun showMovieDetails(match: Match) {
+        getMovieFromMatch(match.movieId?.toInt()!!)
+    }
+
+    private fun getGroupSize() {
+        val docRef = db.collection("groups")
+            .document(groupCode)
+
+        docRef.get()
+            .addOnSuccessListener {
+                val userArrayList = it["users"] as ArrayList<*>
+                groupSize = userArrayList.size
+                getSwipes()
+            }
+    }
+
 
     private fun getSwipes() {
 
@@ -160,7 +183,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                         Log.i(TAG, "Like: $likesDouble")
                         Log.i(TAG, "Not: $notTodayDouble")
                         Log.i(TAG, "Never: $neverDouble")
-                        Log.i(TAG, "match percentage: $matchPercentage")
+                        Log.i(TAG, "Match percentage: $matchPercentage")
                     }
                     setMovieTitles()
                 }
@@ -337,7 +360,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                     //Delete group if you are the last group member
                     docRef.delete()
                         .addOnSuccessListener {
-                            deleteSwipesAndSharedPref()
+                            deleteAllAndSharedPref()
                             replaceFragment(CreateGroupFragment())
                             Log.d(TAG, "DocumentSnapshot successfully deleted!")
                         }
@@ -357,6 +380,25 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                 }
             }.addOnFailureListener { e ->
                 Log.i(TAG, e.toString())
+            }
+    }
+
+    private fun deleteAllAndSharedPref() {
+        MainActivity.isInGroup = false
+        deleteSharedPreferencesList(requireContext())
+        deleteAllFromGroup()
+    }
+
+    private fun deleteAllFromGroup() {
+        val colRef = db.collection("groups")
+            .document(groupCode)
+            .collection("swipes")
+
+            colRef.get()
+            .addOnSuccessListener {result ->
+                for (document in result) {
+                    colRef.document(document.id).delete()
+                }
             }
     }
 
@@ -416,6 +458,22 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         )
     }
 
+    private fun getMovieFromMatch(movieId: Int) {
+        MoviesRepository.getMovieDetails(movieId,
+            onSuccess = ::onMatchMovieFetched,
+            onError = ::onError
+        )
+    }
+
+    private fun onMatchMovieFetched(movie: Movie) {
+        val intent = Intent(activity, MovieDetailsActivity::class.java)
+        intent.putExtra(MOVIE_POSTER, movie.posterPath)
+        intent.putExtra(MOVIE_TITLE, movie.title)
+        intent.putExtra(MOVIE_ID, movie.id)
+        intent.putExtra(MOVIE_OVERVIEW, movie.overview)
+        startActivity(intent)
+    }
+
     private fun onMovieFetched(movie: Movie) { //Used in getPopularMovies. Fetch data if success
         Log.d(TAG, "Movie: $movie")
         Log.i(TAG, "Movie: ${movie.id} and ${movie.title}")
@@ -427,6 +485,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         colSize--
         if (colSize == 0) {
             progressBar.visibility = View.GONE
+            matchRecyclerView.visibility = View.VISIBLE
             setAdapter(matchArrayList)
         }
     }
