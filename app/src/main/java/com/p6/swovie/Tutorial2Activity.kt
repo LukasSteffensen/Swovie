@@ -15,6 +15,7 @@ class Tutorial2Activity : AppCompatActivity() {
 
         buttonOk = findViewById(R.id.buttonOk4)
 
+
         buttonOk.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
