@@ -70,6 +70,7 @@
 
     <TextView
         android:id="@+id/textView_no_matches"
+        android:textAlignment="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/TextAppearance.AppCompat.Title"
@@ -78,4 +79,16 @@
         app:layout_constraintEnd_toEndOf="@+id/recyclerView_matches"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_current_group_code" />
+
+    <Button
+        android:id="@+id/buttonGoSwipe"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Start swiping"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_no_matches" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
