@@ -79,7 +79,7 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
                     .append(editTextCode3.text.toString())
                     .append(editTextCode4.text.toString())
                 Log.i(TAG, groupCode)
-                groupCode = sb.toString()
+                groupCode = sb.toString().toUpperCase()
                 joinGroup(groupCode)
             } else if (editTextCode4.text.isEmpty()) {
                 openSoftKeyboard(editTextCode3)
