@@ -107,14 +107,6 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    private fun deleteSharedPreferencesList() {
-        val mPrefs: SharedPreferences =
-            activity?.getSharedPreferences("savedMovieList", Context.MODE_PRIVATE)!!
-        val prefsEditor = mPrefs.edit()
-        prefsEditor.clear()
-        prefsEditor.commit()
-    }
-
     override fun onClick(view: View?) { // All OnClick for the buttons in this Fragment
         when (view) {
             buttonCreate -> {
@@ -132,16 +124,13 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
     }
 
     private fun joinGroup(code: String) {
-        if (code.isEmpty()) {
-            //      inputAgain(editTextCode, "Please put in a group code")
-        } else {
             val docRef = db.collection("groups").document(code)
             val updates = hashMapOf<String, Any>(
                 "users" to FieldValue.arrayUnion(uid)
             )
             docRef.update(updates).addOnSuccessListener {
                 MainActivity.isInGroup = true
-                MainActivity.groupCode = groupCode
+                MainActivity.groupCode = code
                 replaceFragment(secondMatchFragment)
             }.addOnFailureListener {
                 toast("Group $code does not exist")
@@ -150,7 +139,6 @@ class CreateGroupFragment : Fragment(), View.OnClickListener {
                 editTextCode3.text.clear()
                 editTextCode4.text.clear()
                 openSoftKeyboard(editTextCode1)
-            }
         }
     }
 
