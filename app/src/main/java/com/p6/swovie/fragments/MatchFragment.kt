@@ -86,8 +86,6 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
 
         groupCode = MainActivity.groupCode
         textViewGroup.text = "Group Code: $groupCode"
-        //getGroupSize() calls getSwipes()
-//        getGroupSize()
 
         return root
     }
@@ -179,7 +177,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
                         val notTodayDouble = notTodays.size
                         val neverDouble = nevers.size.toDouble()
 
-                        var tempGroupSize = groupSize + superLikesDouble.toInt() + neverDouble.toInt()
+                        val tempGroupSize = groupSize + superLikesDouble.toInt() + neverDouble.toInt()
                         matchPercentage = (2*superLikesDouble+likesDouble)*100/tempGroupSize
 
                         val match = Match(movieId,"",matchPercentage, "")
