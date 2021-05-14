@@ -12,9 +12,11 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.isInvisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -33,8 +35,10 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
 
     private lateinit var buttonViewMembers: Button
     private lateinit var buttonLeave: Button
+    private lateinit var buttonSwipe: Button
     private lateinit var textViewGroup: TextView
     private lateinit var textViewNoMatches: TextView
+    private lateinit var bottomNavigation: BottomNavigationView
 
     private lateinit var uid: String
     private lateinit var movieId: String
@@ -67,13 +71,18 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         //Components from fragment_match2 layout
         buttonViewMembers = root.findViewById(R.id.button_view_members)
         buttonLeave = root.findViewById(R.id.button_leave_group)
+        buttonSwipe = root.findViewById(R.id.buttonGoSwipe)
         textViewGroup = root.findViewById(R.id.textView_current_group_code)
         textViewNoMatches = root.findViewById(R.id.textView_no_matches)
         matchRecyclerView = root.findViewById(R.id.recyclerView_matches)
+        bottomNavigation = activity!!.findViewById(R.id.navigation_bar)
+
+        buttonSwipe.visibility = View.INVISIBLE
 
         //Click listeners, makes onClick methods possible
         buttonViewMembers.setOnClickListener(this)
         buttonLeave.setOnClickListener(this)
+        buttonSwipe.setOnClickListener(this)
 
         groupCode = MainActivity.groupCode
         textViewGroup.text = "Group Code: $groupCode"
@@ -115,6 +124,11 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
             }
     }
 
+    private fun switchToSwipe() {
+        bottomNavigation.selectedItemId = R.id.ic_movie
+        replaceFragment(MovieFragment())
+    }
+
 
     private fun getSwipes() {
 
@@ -127,8 +141,9 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
             .get()
             .addOnSuccessListener { result ->
                 if (result.isEmpty) {
-                    textViewNoMatches.text = getString(R.string.nomatches)
+                    textViewNoMatches.text = getString(R.string.nomatches) + "\nSwipe movies to get a match"
                     progressBar.visibility = View.GONE
+                    buttonSwipe.visibility = View.VISIBLE
                 } else {
                     var superLikes: ArrayList<String>
                     var likes: ArrayList<String>
@@ -448,6 +463,7 @@ class MatchFragment : Fragment(), View.OnClickListener, MatchAdapter.OnClickList
         when (v) {
             buttonViewMembers -> viewMembers()
             buttonLeave -> leaveGroupDialog()
+            buttonSwipe -> switchToSwipe()
         }
     }
 
