@@ -149,13 +149,13 @@ class RegisterActivity : AppCompatActivity() {
              .addOnCompleteListener(this) { task ->
                  if (task.isSuccessful) {
                      userID = auth.currentUser!!.uid
-//                     auth.currentUser?.sendEmailVerification()
-//                         ?.addOnSuccessListener (this) {
-//                             if (task.isSuccessful) {
-//                                 toast("A verification email has been sent")
+                     auth.currentUser?.sendEmailVerification()
+                         ?.addOnSuccessListener (this) {
+                             if (task.isSuccessful) {
+                                 toast("A verification email has been sent")
                                  addUserToDatabase()
-//                             }
-//                         }
+                             }
+                         }
                      // Sign in success, update UI with the signed-in user's information
                      Log.d(TAG, "createUserWithEmail:success")
                  } else {
